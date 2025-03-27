@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DashboardHeader } from '../layout/DashboardHeader';
 import { FilterBar } from './FilterBar';
@@ -106,7 +105,7 @@ export function Dashboard() {
           customContent={
             <div className="mt-2">
               <Progress 
-                value={(stats?.status.passed || 0) / (stats?.totalBuilds || 1) * 100} 
+                value={stats?.successRate || 0}
                 className="h-2"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -166,7 +165,7 @@ export function Dashboard() {
               <span className="font-semibold text-lg text-status-inprogress">
                 {stats?.status.inprogress || 0}
               </span>
-              <span className="text-xs text-gray-500">In Progress</span>
+              <span className="text-xs text-gray-500">Running</span>
             </div>
           </div>
         </div>

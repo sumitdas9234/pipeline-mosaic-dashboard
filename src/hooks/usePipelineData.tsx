@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from 'react';
 import { 
   fetchProducts, 
@@ -12,15 +11,17 @@ import {
   FilterOptions
 } from '@/types';
 
-export function usePipelineData() {
+const defaultFilters: FilterOptions = {
+  productId: null,
+  releaseId: null,
+  buildId: null
+};
+
+export function usePipelineData(initialFilters: FilterOptions = defaultFilters) {
   const [products, setProducts] = useState<Product[]>([]);
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [stats, setStats] = useState<PipelineStats | null>(null);
-  const [filters, setFilters] = useState<FilterOptions>({
-    productId: null,
-    releaseId: null,
-    buildId: null
-  });
+  const [filters, setFilters] = useState<FilterOptions>(initialFilters);
   const [loading, setLoading] = useState({
     products: true,
     pipelines: true,

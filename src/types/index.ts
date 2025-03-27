@@ -13,6 +13,7 @@ export interface Pipeline {
   buildId: string;
   platformIssues?: number;
   history?: Status[]; // Added history field
+  testsetId: string; // Add this new field
 }
 
 export interface Product {

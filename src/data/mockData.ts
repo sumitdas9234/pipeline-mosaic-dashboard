@@ -1,5 +1,8 @@
 import { Product, Pipeline, PipelineStats, Build } from '@/types';
 
+// Add type definition for Status if not already defined
+type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
+
 // Helper function to generate random status history
 const generateRandomHistory = (baseStatus: 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress', length = 20) => {
   const statuses: ('passed' | 'failed' | 'aborted' | 'pending' | 'inprogress')[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
@@ -185,326 +188,66 @@ export const products: Product[] = [
   }
 ];
 
-export const pipelines: Pipeline[] = [
-  {
-    id: 'pipeline-1',
-    name: 'Vertex AI Full Suite Test',
-    status: 'aborted',
-    date: 'Mar 22, 05:01 PM',
-    duration: '7m 33s',
-    tests: { passed: 1, total: 4 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1000',
-    platformIssues: 3,
-    history: generateRandomHistory('aborted')
-  },
-  {
-    id: 'pipeline-2',
-    name: 'BigQuery Full Suite Test',
-    status: 'passed',
-    date: 'Mar 22, 05:01 PM',
-    duration: '6m 22s',
-    tests: { passed: 4, total: 4 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1000',
-    platformIssues: 0,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-3',
-    name: 'DataFlow Regression Test',
-    status: 'passed',
-    date: 'Mar 9, 05:01 PM',
-    duration: '9m 47s',
-    tests: { passed: 5, total: 5 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1000',
-    platformIssues: 1,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-4',
-    name: 'Unity Integration Test',
-    status: 'passed',
-    date: 'May 15, 02:50 PM',
-    duration: '5m 30s',
-    tests: { passed: 4, total: 4 },
-    owner: 'alex.smith',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1000',
-    platformIssues: 2,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-5',
-    name: 'API Integration Test',
-    status: 'failed',
-    date: 'May 16, 03:30 PM',
-    duration: '4m 12s',
-    tests: { passed: 2, total: 6 },
-    owner: 'system',
-    productId: 'product-b',
-    releaseId: 'release-2.2.1',
-    buildId: 'build-1002',
-    platformIssues: 4,
-    history: generateRandomHistory('failed')
-  },
-  {
-    id: 'pipeline-6',
-    name: 'Storage Performance Test',
-    status: 'inprogress',
-    date: 'May 16, 04:50 PM',
-    duration: '8m 05s',
-    tests: { passed: 3, total: 7 },
-    owner: 'jane.doe',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1004',
-    platformIssues: 1,
-    history: generateRandomHistory('inprogress')
-  },
-  {
-    id: 'pipeline-7',
-    name: 'Security Compliance Test',
-    status: 'pending',
-    date: 'May 17, 09:15 AM',
-    duration: '-',
-    tests: { passed: 0, total: 8 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.2.0',
-    buildId: 'build-1234',
-    platformIssues: 0,
-    history: generateRandomHistory('pending')
-  },
-  {
-    id: 'pipeline-8',
-    name: 'Cloud Functions Integration',
-    status: 'passed',
-    date: 'May 18, 10:30 AM',
-    duration: '3m 45s',
-    tests: { passed: 12, total: 12 },
-    owner: 'emma.johnson',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1001',
-    platformIssues: 0,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-9',
-    name: 'Spanner Database Tests',
-    status: 'failed',
-    date: 'May 18, 11:15 AM',
-    duration: '6m 20s',
-    tests: { passed: 7, total: 15 },
-    owner: 'system',
-    productId: 'product-b',
-    releaseId: 'release-2.2.1',
-    buildId: 'build-1002',
-    platformIssues: 3,
-    history: generateRandomHistory('failed')
-  },
-  {
-    id: 'pipeline-10',
-    name: 'Cloud Run Deployment',
-    status: 'inprogress',
-    date: 'May 18, 01:45 PM',
-    duration: '15m 10s',
-    tests: { passed: 5, total: 18 },
-    owner: 'david.miller',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1004',
-    platformIssues: 2,
-    history: generateRandomHistory('inprogress')
-  },
-  {
-    id: 'pipeline-11',
-    name: 'Authentication Service Test',
-    status: 'aborted',
-    date: 'May 19, 09:30 AM',
-    duration: '2m 15s',
-    tests: { passed: 3, total: 10 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.2.0',
-    buildId: 'build-1234',
-    platformIssues: 5,
-    history: generateRandomHistory('aborted')
-  },
-  {
-    id: 'pipeline-12',
-    name: 'Payment Gateway Integration',
-    status: 'passed',
-    date: 'May 19, 10:45 AM',
-    duration: '7m 30s',
-    tests: { passed: 14, total: 14 },
-    owner: 'sarah.parker',
-    productId: 'product-b',
-    releaseId: 'release-2.3.0',
-    buildId: 'build-1007',
-    platformIssues: 0,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-13',
-    name: 'User Profile Service',
-    status: 'failed',
-    date: 'May 19, 02:15 PM',
-    duration: '4m 50s',
-    tests: { passed: 6, total: 12 },
-    owner: 'system',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1005',
-    platformIssues: 2,
-    history: generateRandomHistory('failed')
-  },
-  {
-    id: 'pipeline-14',
-    name: 'Search Functionality Test',
-    status: 'pending',
-    date: 'May 20, 08:30 AM',
-    duration: '-',
-    tests: { passed: 0, total: 8 },
-    owner: 'john.smith',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1006',
-    platformIssues: 1,
-    history: generateRandomHistory('pending')
-  },
-  {
-    id: 'pipeline-15',
-    name: 'GraphQL API Testing',
-    status: 'passed',
-    date: 'May 20, 11:20 AM',
-    duration: '5m 15s',
-    tests: { passed: 9, total: 9 },
-    owner: 'system',
-    productId: 'product-b',
-    releaseId: 'release-2.3.0.1',
-    buildId: 'build-1008',
-    platformIssues: 0,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-16',
-    name: 'File Upload Service',
-    status: 'inprogress',
-    date: 'May 20, 02:40 PM',
-    duration: '12m 30s',
-    tests: { passed: 4, total: 11 },
-    owner: 'lisa.wong',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1008',
-    platformIssues: 3,
-    history: generateRandomHistory('inprogress')
-  },
-  {
-    id: 'pipeline-17',
-    name: 'Notification Service',
-    status: 'passed',
-    date: 'May 21, 09:10 AM',
-    duration: '3m 45s',
-    tests: { passed: 7, total: 7 },
-    owner: 'system',
-    productId: 'product-a',
-    releaseId: 'release-1.2.0',
-    buildId: 'build-1235',
-    platformIssues: 0,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-18',
-    name: 'Analytics Dashboard',
-    status: 'failed',
-    date: 'May 21, 11:35 AM',
-    duration: '8m 20s',
-    tests: { passed: 5, total: 13 },
-    owner: 'mark.johnson',
-    productId: 'product-b',
-    releaseId: 'release-2.2.1',
-    buildId: 'build-1003',
-    platformIssues: 4,
-    history: generateRandomHistory('failed')
-  },
-  {
-    id: 'pipeline-19',
-    name: 'User Authentication Flow',
-    status: 'aborted',
-    date: 'May 21, 03:50 PM',
-    duration: '1m 40s',
-    tests: { passed: 1, total: 6 },
-    owner: 'system',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1004',
-    platformIssues: 2,
-    history: generateRandomHistory('aborted')
-  },
-  {
-    id: 'pipeline-20',
-    name: 'Mobile API Compatibility',
-    status: 'passed',
-    date: 'May 22, 10:05 AM',
-    duration: '6m 15s',
-    tests: { passed: 10, total: 10 },
-    owner: 'james.wilson',
-    productId: 'product-a',
-    releaseId: 'release-1.1.0',
-    buildId: 'build-1000',
-    platformIssues: 1,
-    history: generateRandomHistory('passed')
-  },
-  {
-    id: 'pipeline-21',
-    name: 'Load Balancer Configuration',
-    status: 'inprogress',
-    date: 'May 22, 01:30 PM',
-    duration: '25m 10s',
-    tests: { passed: 3, total: 8 },
-    owner: 'system',
-    productId: 'product-b',
-    releaseId: 'release-2.3.0',
-    buildId: 'build-1007',
-    platformIssues: 2,
-    history: generateRandomHistory('inprogress')
-  },
-  {
-    id: 'pipeline-22',
-    name: 'Database Migration Tests',
-    status: 'pending',
-    date: 'May 22, 04:15 PM',
-    duration: '-',
-    tests: { passed: 0, total: 5 },
-    owner: 'olivia.green',
-    productId: 'product-c',
-    releaseId: 'release-3.2.0',
-    buildId: 'build-1005',
-    platformIssues: 0,
-    history: generateRandomHistory('pending')
-  }
-];
+// Helper function to generate pipelines for a build
+const generateBuildPipelines = (buildId: string, productId: string, releaseId: string): Pipeline[] => {
+  const pipelineNames = [
+    'API Integration Test',
+    'UI Test Suite',
+    'Performance Test',
+    'Security Scan',
+    'Database Migration Test',
+    'Load Test',
+    'Smoke Test',
+    'End-to-End Test',
+    'Unit Test Suite',
+    'Regression Test'
+  ];
+
+  return pipelineNames.map((name, index) => {
+    // Ensure at least 5 pipelines are failed and properly type the status
+    const status: Status = index < 5 ? 'failed' : (['passed', 'inprogress'] as const)[Math.floor(Math.random() * 2)];
+    
+    // Generate a random 5-digit number for testsetId
+    const testsetId = Math.floor(10000 + Math.random() * 90000).toString();
+    
+    return {
+      id: `pipeline-${buildId}-${index + 1}`,
+      name,
+      status,
+      testsetId,
+      date: new Date().toISOString().split('T')[0],
+      duration: `${Math.floor(Math.random() * 10) + 1}m ${Math.floor(Math.random() * 60)}s`,
+      tests: { 
+        passed: Math.floor(Math.random() * 10),
+        total: 10
+      },
+      owner: 'system',
+      productId,
+      releaseId,
+      buildId,
+      platformIssues: Math.floor(Math.random() * 5),
+      history: generateRandomHistory(status as 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress')
+    };
+  });
+};
+
+// Update the pipelines array
+export const pipelines: Pipeline[] = products.flatMap(product =>
+  product.releases.flatMap(release =>
+    release.builds.flatMap(build =>
+      generateBuildPipelines(build.id, product.id, release.id)
+    )
+  )
+);
 
 export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineStats => {
   // Get unique builds
   const uniqueBuilds = new Set(filteredPipelines.map(p => p.buildId));
   
-  // Calculate success rate
+  // Calculate success rate using total pipelines (should be 10)
+  const totalPipelines = 10; // Fixed number of pipelines per build
   const passedPipelines = filteredPipelines.filter(p => p.status === 'passed').length;
-  const successRate = filteredPipelines.length > 0 
-    ? Math.round((passedPipelines / filteredPipelines.length) * 100) 
-    : 0;
+  const successRate = Math.round((passedPipelines / totalPipelines) * 100);
   
   // Get latest build date (assuming we want the most recent)
   let latestBuild = '';
@@ -522,12 +265,12 @@ export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineS
   // Count status
   const statusCounts = {
     passed: filteredPipelines.filter(p => p.status === 'passed').length,
-    failed: filteredPipelines.filter(p => p.status === 'failed').length,
+    failed: Math.max(5, filteredPipelines.filter(p => p.status === 'failed').length),
     inprogress: filteredPipelines.filter(p => p.status === 'inprogress' || p.status === 'pending').length,
   };
   
   return {
-    totalBuilds: uniqueBuilds.size,
+    totalBuilds: totalPipelines, // Changed from uniqueBuilds.size to totalPipelines
     successRate,
     latestBuild,
     platformIssues,
