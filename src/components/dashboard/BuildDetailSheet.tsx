@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Sheet,
   SheetContent, 
@@ -27,8 +27,6 @@ interface BuildDetailSheetProps {
 }
 
 export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: BuildDetailSheetProps) {
-  const [activeTab, setActiveTab] = useState("stats");
-  
   if (!build) return null;
 
   const getStatusIcon = (status: string) => {
@@ -140,7 +138,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
         </Card>
 
         {/* Tabs Navigation */}
-        <Tabs defaultValue="stats" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs defaultValue="stats" className="space-y-4">
           <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <PieChart className="h-4 w-4" />
