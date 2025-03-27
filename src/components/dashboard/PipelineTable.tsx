@@ -121,23 +121,33 @@ export function PipelineTable({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 items-center">
-          <span className="text-sm text-gray-500">Status:</span>
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 py-0 pl-3 pr-8 appearance-none bg-gray-50 border border-gray-100 rounded-md text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-crystal-primary focus:border-transparent"
-            >
-              <option value="all">All Statuses</option>
-              <option value="passed">Passed</option>
-              <option value="failed">Failed</option>
-              <option value="aborted">Aborted</option>
-              <option value="pending">Pending</option>
-              <option value="inprogress">In Progress</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-              <ChevronDown className="h-4 w-4 text-gray-400" />
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-2">
+            <Switch 
+              checked={!showOnlyFailed} 
+              onCheckedChange={(checked) => setShowOnlyFailed(!checked)} 
+              className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300"
+            />
+            <span className="text-sm text-gray-500">Show all</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Status:</span>
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-9 py-0 pl-3 pr-8 appearance-none bg-gray-50 border border-gray-100 rounded-md text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-crystal-primary focus:border-transparent"
+              >
+                <option value="all">All Statuses</option>
+                <option value="passed">Passed</option>
+                <option value="failed">Failed</option>
+                <option value="aborted">Aborted</option>
+                <option value="pending">Pending</option>
+                <option value="inprogress">In Progress</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                <ChevronDown className="h-4 w-4 text-gray-400" />
+              </div>
             </div>
           </div>
         </div>
@@ -146,20 +156,7 @@ export function PipelineTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-24">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center">
-                    <Switch 
-                      checked={!showOnlyFailed} 
-                      onCheckedChange={(checked) => setShowOnlyFailed(!checked)} 
-                      className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-500">
-                      {showOnlyFailed ? 'Failed Only' : 'Show All'}
-                    </span>
-                  </div>
-                </div>
-              </TableHead>
+              <TableHead className="w-24">Status</TableHead>
               <TableHead>Pipeline</TableHead>
               <TableHead className="w-36">Date</TableHead>
               <TableHead className="w-28">Duration</TableHead>
@@ -175,3 +172,4 @@ export function PipelineTable({
     </div>
   );
 }
+
