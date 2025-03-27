@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Pipeline } from '@/types';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatusHistory } from '@/components/common/StatusHistory';
@@ -34,6 +36,7 @@ export function PipelineTable({
   isLoading = false,
   className
 }: PipelineTableProps) {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showOnlyFailed, setShowOnlyFailed] = useState(true);
@@ -55,6 +58,10 @@ export function PipelineTable({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleRowClick = (pipelineId: string) => {
+    navigate(`/pipeline/${pipelineId}`);
   };
 
   // Reset to first page when filters change
@@ -84,7 +91,7 @@ export function PipelineTable({
     if (isLoading) {
       return Array(4).fill(0).map((_, index) => (
         <TableRow key={`skeleton-${index}`}>
-          {Array(7).fill(0).map((_, cellIndex) => ( // Updated to 7 cells for the new column
+          {Array(7).fill(0).map((_, cellIndex) => (
             <TableCell key={`cell-${index}-${cellIndex}`}>
               <div className="animate-pulse bg-gray-100 h-4 rounded w-3/4" />
             </TableCell>
@@ -96,7 +103,7 @@ export function PipelineTable({
     if (filteredPipelines.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={7} className="text-center py-8 text-gray-500"> {/* Updated colspan to 7 */}
+          <TableCell colSpan={7} className="text-center py-8 text-gray-500">
             {searchTerm || statusFilter !== 'all' || showOnlyFailed ? 
               'No pipelines match your filters' : 
               'No pipelines available'}
@@ -108,7 +115,8 @@ export function PipelineTable({
     return paginatedPipelines.map(pipeline => (
       <TableRow 
         key={pipeline.id}
-        className="pipeline-row"
+        className="pipeline-row cursor-pointer hover:bg-gray-50"
+        onClick={() => handleRowClick(pipeline.id)}
       >
         <TableCell>
           <StatusBadge status={pipeline.status} />
@@ -251,7 +259,7 @@ export function PipelineTable({
           </TableBody>
         </Table>
       </div>
-      {renderPagination()}
+      {totalPages > 0 && renderPagination()}
     </div>
   );
 }

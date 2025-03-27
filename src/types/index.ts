@@ -1,3 +1,4 @@
+
 export type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
 
 export interface Pipeline {
@@ -63,4 +64,22 @@ export interface FilterOptions {
   productId: string | null;
   releaseId: string | null;
   buildId: string | null;
+}
+
+// New interfaces for the pipeline details page
+export interface TestItem {
+  id: string;
+  name: string;
+  status: Status;
+  duration: string;
+  logs: string;
+}
+
+export interface PipelineDetail extends Pipeline {
+  description?: string;
+  testItems: TestItem[];
+  environment?: string;
+  trigger?: string;
+  startTime?: string;
+  endTime?: string;
 }
