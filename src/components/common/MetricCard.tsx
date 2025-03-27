@@ -7,13 +7,14 @@ import {
   Clock,
   Check,
   X,
-  Play
+  Play,
+  Bug
 } from 'lucide-react';
 
 interface MetricCardProps {
   title: string;
   value: string | number;
-  icon?: 'activity' | 'chart' | 'clock' | 'check' | 'x' | 'play';
+  icon?: 'activity' | 'chart' | 'clock' | 'check' | 'x' | 'play' | 'bug';
   iconColor?: string;
   className?: string;
   isLoading?: boolean;
@@ -50,6 +51,8 @@ export function MetricCard({
         return <X className={cn(iconClass, 'text-status-failed')} />;
       case 'play':
         return <Play className={cn(iconClass, 'text-status-inprogress')} />;
+      case 'bug':
+        return <Bug className={cn(iconClass, 'text-red-500')} />;
       default:
         return null;
     }

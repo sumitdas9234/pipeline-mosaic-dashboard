@@ -12,6 +12,7 @@ export interface Pipeline {
   productId: string;
   releaseId: string;
   buildId: string;
+  platformIssues?: number;
 }
 
 export interface Product {
@@ -37,6 +38,7 @@ export interface PipelineStats {
   totalBuilds: number;
   successRate: number;
   latestBuild: string;
+  platformIssues: number;
   status: {
     passed: number;
     failed: number;

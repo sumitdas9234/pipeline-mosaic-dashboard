@@ -81,7 +81,8 @@ export const pipelines: Pipeline[] = [
     owner: 'system',
     productId: 'product-a',
     releaseId: 'release-1.1.0',
-    buildId: 'build-1000'
+    buildId: 'build-1000',
+    platformIssues: 3
   },
   {
     id: 'pipeline-2',
@@ -93,7 +94,8 @@ export const pipelines: Pipeline[] = [
     owner: 'system',
     productId: 'product-a',
     releaseId: 'release-1.1.0',
-    buildId: 'build-1000'
+    buildId: 'build-1000',
+    platformIssues: 0
   },
   {
     id: 'pipeline-3',
@@ -105,7 +107,8 @@ export const pipelines: Pipeline[] = [
     owner: 'system',
     productId: 'product-a',
     releaseId: 'release-1.1.0',
-    buildId: 'build-1000'
+    buildId: 'build-1000',
+    platformIssues: 1
   },
   {
     id: 'pipeline-4',
@@ -117,7 +120,8 @@ export const pipelines: Pipeline[] = [
     owner: 'alex.smith',
     productId: 'product-a',
     releaseId: 'release-1.1.0',
-    buildId: 'build-1000'
+    buildId: 'build-1000',
+    platformIssues: 2
   },
   {
     id: 'pipeline-5',
@@ -129,7 +133,8 @@ export const pipelines: Pipeline[] = [
     owner: 'system',
     productId: 'product-b',
     releaseId: 'release-2.2.1',
-    buildId: 'build-1002'
+    buildId: 'build-1002',
+    platformIssues: 4
   },
   {
     id: 'pipeline-6',
@@ -141,7 +146,8 @@ export const pipelines: Pipeline[] = [
     owner: 'jane.doe',
     productId: 'product-c',
     releaseId: 'release-3.2.0',
-    buildId: 'build-1004'
+    buildId: 'build-1004',
+    platformIssues: 1
   },
   {
     id: 'pipeline-7',
@@ -153,7 +159,8 @@ export const pipelines: Pipeline[] = [
     owner: 'system',
     productId: 'product-a',
     releaseId: 'release-1.2.0',
-    buildId: 'build-1234'
+    buildId: 'build-1234',
+    platformIssues: 0
   },
 ];
 
@@ -176,6 +183,10 @@ export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineS
     latestBuild = sortedPipelines[0].buildId;
   }
   
+  // Calculate total platform issues
+  const platformIssues = filteredPipelines.reduce((total, pipeline) => 
+    total + (pipeline.platformIssues || 0), 0);
+
   // Count status
   const statusCounts = {
     passed: filteredPipelines.filter(p => p.status === 'passed').length,
@@ -187,6 +198,7 @@ export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineS
     totalBuilds: uniqueBuilds.size,
     successRate,
     latestBuild,
+    platformIssues,
     status: statusCounts
   };
 };
