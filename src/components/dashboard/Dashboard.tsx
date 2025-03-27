@@ -73,8 +73,10 @@ export function Dashboard() {
           isLoading={loading.stats}
           customContent={
             <div className="mt-2 text-xs text-gray-500">
-              <div className="font-mono">
-                {stats?.platformIssues === 0 ? 'No issues detected' : `${stats?.platformIssues} issues found`}
+              <div className="flex items-center gap-1 mb-2">
+                <span className="bg-red-100 text-red-500 px-2 py-0.5 rounded text-xs">
+                  {stats?.platformIssues === 0 ? 'No issues' : `${stats?.platformIssues} issues found`}
+                </span>
               </div>
             </div>
           }
@@ -91,7 +93,7 @@ export function Dashboard() {
                 value={(stats?.status.passed || 0) / (stats?.totalBuilds || 1) * 100} 
                 className="h-2"
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1 font-mono">
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>{stats?.status.passed || 0} passed</span>
                 <span>of {stats?.totalBuilds || 0} total</span>
               </div>
@@ -107,14 +109,16 @@ export function Dashboard() {
           customContent={
             <div className="mt-2 w-full">
               <div className="flex items-center gap-1 mb-2">
-                <span className="bg-crystal-lighter/20 text-crystal-primary px-2 py-0.5 rounded font-mono text-xs">
+                <span className="bg-crystal-lighter/20 text-crystal-primary px-2 py-0.5 rounded text-xs">
                   {Math.floor(Math.random() * 5) + 1} artifacts
+                </span>
+                <span className="bg-green-100 text-green-500 px-2 py-0.5 rounded text-xs">
+                  {availableBuilds.length || 0} builds
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-mono">Total Builds: {availableBuilds.length || 0}</span>
                 {date && (
-                  <span className="text-xs text-gray-500 font-mono">Built on {date}</span>
+                  <span className="text-xs text-gray-500">Built on {date}</span>
                 )}
               </div>
             </div>
@@ -123,25 +127,25 @@ export function Dashboard() {
         
         <div className="glass-card p-5 rounded-xl">
           <h3 className="text-sm font-medium text-gray-500 mb-3">
-            Current Build Status: <span className="font-mono">{buildNumber || '-'}</span>
+            Current Build Status: <span>{buildNumber || '-'}</span>
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col items-center bg-green-50 py-2 px-3 rounded-lg">
-              <span className="font-semibold text-lg text-status-passed font-mono">
+              <span className="font-semibold text-lg text-status-passed">
                 {stats?.status.passed || 0}
               </span>
               <span className="text-xs text-gray-500">Passed</span>
             </div>
             
             <div className="flex flex-col items-center bg-red-50 py-2 px-3 rounded-lg">
-              <span className="font-semibold text-lg text-status-failed font-mono">
+              <span className="font-semibold text-lg text-status-failed">
                 {stats?.status.failed || 0}
               </span>
               <span className="text-xs text-gray-500">Failed</span>
             </div>
             
             <div className="flex flex-col items-center bg-blue-50 py-2 px-3 rounded-lg">
-              <span className="font-semibold text-lg text-status-inprogress font-mono">
+              <span className="font-semibold text-lg text-status-inprogress">
                 {stats?.status.inprogress || 0}
               </span>
               <span className="text-xs text-gray-500">In Progress</span>
