@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pipeline } from '@/types';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { StatusHistory } from '@/components/common/StatusHistory';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -61,7 +62,7 @@ export function PipelineTable({
     if (isLoading) {
       return Array(4).fill(0).map((_, index) => (
         <TableRow key={`skeleton-${index}`}>
-          {Array(6).fill(0).map((_, cellIndex) => (
+          {Array(7).fill(0).map((_, cellIndex) => ( // Updated to 7 cells for the new column
             <TableCell key={`cell-${index}-${cellIndex}`}>
               <div className="animate-pulse bg-gray-100 h-4 rounded w-3/4" />
             </TableCell>
@@ -73,7 +74,7 @@ export function PipelineTable({
     if (filteredPipelines.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+          <TableCell colSpan={7} className="text-center py-8 text-gray-500"> {/* Updated colspan to 7 */}
             {searchTerm || statusFilter !== 'all' || showOnlyFailed ? 
               'No pipelines match your filters' : 
               'No pipelines available'}
@@ -101,6 +102,12 @@ export function PipelineTable({
         </TableCell>
         <TableCell>
           {renderProgressBar(pipeline.tests.passed, pipeline.tests.total)}
+        </TableCell>
+        <TableCell>
+          <StatusHistory 
+            history={pipeline.history || []} 
+            className="min-w-44" // Ensure minimum width for history visualization
+          />
         </TableCell>
         <TableCell className="text-gray-500">
           {pipeline.owner}
@@ -161,6 +168,7 @@ export function PipelineTable({
               <TableHead className="w-36">Date</TableHead>
               <TableHead className="w-28">Duration</TableHead>
               <TableHead className="w-36">Tests</TableHead>
+              <TableHead className="w-48">History</TableHead>
               <TableHead className="w-32">Owner</TableHead>
             </TableRow>
           </TableHeader>
@@ -172,4 +180,3 @@ export function PipelineTable({
     </div>
   );
 }
-

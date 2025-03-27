@@ -12,6 +12,7 @@ export interface Pipeline {
   releaseId: string;
   buildId: string;
   platformIssues?: number;
+  history?: Status[]; // Added history field
 }
 
 export interface Product {
