@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -73,20 +72,22 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
         <CardHeader>
           <CardTitle className="text-base">Pipeline Stats</CardTitle>
         </CardHeader>
-        <CardContent>
-          {/* Increased height and improved centering for chart container */}
-          <div className="h-[360px] w-full flex justify-center items-center">
-            <ChartContainer config={chartConfig} className="w-full max-w-[450px]">
-              {/* Fixed dimensions and increased margins for better visibility */}
-              <RechartsPieChart width={450} height={300} margin={{ top: 30, right: 40, left: 40, bottom: 30 }}>
+        <CardContent className="pt-2 pb-4">
+          <div className="h-[200px] w-full flex justify-center items-center">
+            <ChartContainer config={chartConfig} className="w-full">
+              <RechartsPieChart 
+                width={300} 
+                height={180}
+                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+              >
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={110}
-                  innerRadius={55}
+                  label={false}
+                  outerRadius={70}
+                  innerRadius={35}
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
@@ -102,8 +103,7 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
             </ChartContainer>
           </div>
           
-          {/* More space between chart and legend, better flex layout for legend */}
-          <div className="flex justify-center items-center gap-6 mt-6">
+          <div className="flex justify-center items-center gap-6">
             {chartData.map(item => (
               <div key={item.name} className="flex items-center gap-2">
                 <div className="h-4 w-4 rounded-full" style={{ backgroundColor: item.color }}></div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Sheet,
@@ -70,7 +69,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[95%] sm:w-[650px] lg:w-[60%] xl:w-[50%] overflow-y-auto font-sans">
+      <SheetContent className="w-[95%] sm:w-[650px] lg:w-[40%] xl:w-[40%] overflow-y-auto font-sans">
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center space-x-2">
             <span>Build {build.buildNumber}</span>
