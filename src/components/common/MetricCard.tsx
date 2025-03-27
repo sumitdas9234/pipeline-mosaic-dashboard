@@ -18,6 +18,7 @@ interface MetricCardProps {
   className?: string;
   isLoading?: boolean;
   subtext?: string;
+  customContent?: React.ReactNode;
 }
 
 export function MetricCard({
@@ -27,7 +28,8 @@ export function MetricCard({
   iconColor,
   className,
   isLoading = false,
-  subtext
+  subtext,
+  customContent
 }: MetricCardProps) {
   const renderIcon = () => {
     const iconClass = cn(
@@ -59,7 +61,7 @@ export function MetricCard({
       className
     )}>
       <div className="flex items-start justify-between">
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <h3 className="text-sm font-medium text-gray-500">{title}</h3>
           <div className="mt-2 flex items-baseline">
             {isLoading ? (
@@ -73,6 +75,9 @@ export function MetricCard({
               </div>
             )}
           </div>
+          {customContent && (
+            <div className="w-full">{customContent}</div>
+          )}
         </div>
         {icon && (
           <div className="p-2 bg-gray-50 rounded-lg">

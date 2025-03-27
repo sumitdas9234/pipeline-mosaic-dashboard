@@ -30,6 +30,7 @@ export interface Build {
   id: string;
   buildNumber: string;
   date: string;
+  artifacts?: number;
 }
 
 export interface PipelineStats {

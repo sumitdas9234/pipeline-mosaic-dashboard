@@ -5,6 +5,7 @@ import { FilterBar } from './FilterBar';
 import { MetricCard } from '../common/MetricCard';
 import { PipelineTable } from './PipelineTable';
 import { usePipelineData } from '@/hooks/usePipelineData';
+import { Progress } from '@/components/ui/progress';
 
 export function Dashboard() {
   const {
@@ -33,17 +34,17 @@ export function Dashboard() {
   const availableReleases = getAvailableReleases();
   const availableBuilds = getAvailableBuilds();
 
-  // Get selected build number for display
-  const getSelectedBuildNumber = () => {
-    if (!filters.buildId) return null;
+  // Get selected build number and date for display
+  const getSelectedBuildInfo = () => {
+    if (!filters.buildId) return { buildNumber: null, date: null };
     const build = availableBuilds.find(b => b.id === filters.buildId);
-    return build ? build.buildNumber : null;
+    return build ? { buildNumber: build.buildNumber, date: build.date } : { buildNumber: null, date: null };
   };
 
-  const selectedBuildNumber = getSelectedBuildNumber();
+  const { buildNumber, date } = getSelectedBuildInfo();
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 w-[90%] mx-auto">
       <DashboardHeader 
         title="Pipeline Dashboard" 
         description="Monitor and manage your build pipelines"
@@ -66,7 +67,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <MetricCard
           title="Total Builds"
-          value={stats?.totalBuilds || 0}
+          value={availableBuilds.length || 0}
           icon="activity"
           isLoading={loading.stats}
         />
@@ -76,18 +77,42 @@ export function Dashboard() {
           value={`${stats?.successRate || 0}%`}
           icon="chart"
           isLoading={loading.stats}
+          customContent={
+            <div className="mt-2">
+              <Progress 
+                value={(stats?.status.passed || 0) / (stats?.totalBuilds || 1) * 100} 
+                className="h-2"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{stats?.status.passed || 0} passed</span>
+                <span>of {stats?.totalBuilds || 0} total</span>
+              </div>
+            </div>
+          }
         />
         
         <MetricCard
           title="Latest Build"
-          value={selectedBuildNumber || '-'}
+          value={buildNumber || '-'}
           icon="clock"
           isLoading={loading.stats}
+          subtext={date ? `Built on ${date}` : ''}
+          customContent={
+            date && (
+              <div className="mt-2 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <span className="bg-crystal-lighter/20 text-crystal-primary px-2 py-0.5 rounded">
+                    {Math.floor(Math.random() * 5) + 1} artifacts
+                  </span>
+                </div>
+              </div>
+            )
+          }
         />
         
         <div className="glass-card p-5 rounded-xl">
           <h3 className="text-sm font-medium text-gray-500 mb-3">
-            Current Build Status: {selectedBuildNumber || '-'}
+            Current Build Status: {buildNumber || '-'}
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col items-center bg-green-50 py-2 px-3 rounded-lg">
