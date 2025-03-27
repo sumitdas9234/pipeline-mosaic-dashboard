@@ -1,5 +1,24 @@
-
 import { Product, Pipeline, PipelineStats, Build } from '@/types';
+
+// Helper function to generate random status history
+const generateRandomHistory = (baseStatus: 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress', length = 20) => {
+  const statuses: ('passed' | 'failed' | 'aborted' | 'pending' | 'inprogress')[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
+  const history = [];
+  
+  // Make the history somewhat biased towards the current status
+  const bias = 0.5; // 50% chance to be the base status
+  
+  for (let i = 0; i < length; i++) {
+    if (Math.random() < bias) {
+      history.push(baseStatus);
+    } else {
+      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+      history.push(randomStatus);
+    }
+  }
+  
+  return history;
+};
 
 export const products: Product[] = [
   {
@@ -178,7 +197,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1000',
-    platformIssues: 3
+    platformIssues: 3,
+    history: generateRandomHistory('aborted')
   },
   {
     id: 'pipeline-2',
@@ -191,7 +211,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1000',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-3',
@@ -204,7 +225,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1000',
-    platformIssues: 1
+    platformIssues: 1,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-4',
@@ -217,7 +239,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1000',
-    platformIssues: 2
+    platformIssues: 2,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-5',
@@ -230,7 +253,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.2.1',
     buildId: 'build-1002',
-    platformIssues: 4
+    platformIssues: 4,
+    history: generateRandomHistory('failed')
   },
   {
     id: 'pipeline-6',
@@ -243,7 +267,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1004',
-    platformIssues: 1
+    platformIssues: 1,
+    history: generateRandomHistory('inprogress')
   },
   {
     id: 'pipeline-7',
@@ -256,7 +281,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.2.0',
     buildId: 'build-1234',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('pending')
   },
   {
     id: 'pipeline-8',
@@ -269,7 +295,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1001',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-9',
@@ -282,7 +309,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.2.1',
     buildId: 'build-1002',
-    platformIssues: 3
+    platformIssues: 3,
+    history: generateRandomHistory('failed')
   },
   {
     id: 'pipeline-10',
@@ -295,7 +323,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1004',
-    platformIssues: 2
+    platformIssues: 2,
+    history: generateRandomHistory('inprogress')
   },
   {
     id: 'pipeline-11',
@@ -308,7 +337,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.2.0',
     buildId: 'build-1234',
-    platformIssues: 5
+    platformIssues: 5,
+    history: generateRandomHistory('aborted')
   },
   {
     id: 'pipeline-12',
@@ -321,7 +351,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.3.0',
     buildId: 'build-1007',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-13',
@@ -334,7 +365,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1005',
-    platformIssues: 2
+    platformIssues: 2,
+    history: generateRandomHistory('failed')
   },
   {
     id: 'pipeline-14',
@@ -347,7 +379,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1006',
-    platformIssues: 1
+    platformIssues: 1,
+    history: generateRandomHistory('pending')
   },
   {
     id: 'pipeline-15',
@@ -360,7 +393,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.3.0.1',
     buildId: 'build-1008',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-16',
@@ -373,7 +407,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1008',
-    platformIssues: 3
+    platformIssues: 3,
+    history: generateRandomHistory('inprogress')
   },
   {
     id: 'pipeline-17',
@@ -386,7 +421,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.2.0',
     buildId: 'build-1235',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-18',
@@ -399,7 +435,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.2.1',
     buildId: 'build-1003',
-    platformIssues: 4
+    platformIssues: 4,
+    history: generateRandomHistory('failed')
   },
   {
     id: 'pipeline-19',
@@ -412,7 +449,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1004',
-    platformIssues: 2
+    platformIssues: 2,
+    history: generateRandomHistory('aborted')
   },
   {
     id: 'pipeline-20',
@@ -425,7 +463,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-a',
     releaseId: 'release-1.1.0',
     buildId: 'build-1000',
-    platformIssues: 1
+    platformIssues: 1,
+    history: generateRandomHistory('passed')
   },
   {
     id: 'pipeline-21',
@@ -438,7 +477,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-b',
     releaseId: 'release-2.3.0',
     buildId: 'build-1007',
-    platformIssues: 2
+    platformIssues: 2,
+    history: generateRandomHistory('inprogress')
   },
   {
     id: 'pipeline-22',
@@ -451,7 +491,8 @@ export const pipelines: Pipeline[] = [
     productId: 'product-c',
     releaseId: 'release-3.2.0',
     buildId: 'build-1005',
-    platformIssues: 0
+    platformIssues: 0,
+    history: generateRandomHistory('pending')
   }
 ];
 
