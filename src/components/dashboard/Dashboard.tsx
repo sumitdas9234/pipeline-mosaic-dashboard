@@ -5,6 +5,8 @@ import { FilterBar } from './FilterBar';
 import { MetricCard } from '../common/MetricCard';
 import { PipelineTable } from './PipelineTable';
 import { usePipelineData } from '@/hooks/usePipelineData';
+import { useBuildDetails } from '@/hooks/useBuildDetails';
+import { BuildDetailSheet } from './BuildDetailSheet';
 import { Progress } from '@/components/ui/progress';
 import { Bug, Clock } from 'lucide-react';
 
@@ -20,6 +22,14 @@ export function Dashboard() {
     getAvailableBuilds,
   } = usePipelineData();
 
+  const {
+    isLoading: isBuildLoading,
+    buildDetails,
+    isSheetOpen,
+    fetchDetails,
+    closeSheet
+  } = useBuildDetails();
+
   const handleProductChange = (productId: string) => {
     updateFilters({ productId });
   };
@@ -30,6 +40,12 @@ export function Dashboard() {
 
   const handleBuildChange = (buildId: string) => {
     updateFilters({ buildId });
+  };
+
+  const handleBuildCardClick = () => {
+    if (filters.buildId) {
+      fetchDetails(filters.buildId);
+    }
   };
 
   const availableReleases = getAvailableReleases();
@@ -106,6 +122,8 @@ export function Dashboard() {
           value={buildNumber || '-'}
           icon="clock"
           isLoading={loading.stats}
+          className="cursor-pointer hover:shadow-md transition-shadow duration-200"
+          onClick={handleBuildCardClick}
           customContent={
             <div className="mt-2 w-full">
               <div className="flex items-center gap-1 mb-2">
@@ -158,6 +176,14 @@ export function Dashboard() {
       <PipelineTable 
         pipelines={pipelines} 
         isLoading={loading.pipelines}
+      />
+
+      {/* Build Detail Sheet */}
+      <BuildDetailSheet
+        isOpen={isSheetOpen}
+        onClose={closeSheet}
+        build={buildDetails}
+        pipelineStats={stats?.status}
       />
     </div>
   );

@@ -1,4 +1,3 @@
-
 export type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
 
 export interface Pipeline {
@@ -31,7 +30,19 @@ export interface Build {
   id: string;
   buildNumber: string;
   date: string;
-  artifacts?: number;
+  status: 'passed' | 'failed' | 'inprogress';
+  commitDetails: {
+    commitId: string;
+    repositoryUrl: string;
+    branch: string;
+    author: string;
+  }[];
+  artifacts: {
+    name: string;
+    imageUrl: string;
+    shaDigest: string;
+  }[];
+  jenkinsUrl: string;
 }
 
 export interface PipelineStats {

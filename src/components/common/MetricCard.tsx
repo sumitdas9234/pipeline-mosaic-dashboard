@@ -20,6 +20,7 @@ interface MetricCardProps {
   isLoading?: boolean;
   subtext?: string;
   customContent?: React.ReactNode;
+  onClick?: () => void;
 }
 
 export function MetricCard({
@@ -30,7 +31,8 @@ export function MetricCard({
   className,
   isLoading = false,
   subtext,
-  customContent
+  customContent,
+  onClick
 }: MetricCardProps) {
   const renderIcon = () => {
     const iconClass = cn(
@@ -59,10 +61,16 @@ export function MetricCard({
   };
 
   return (
-    <div className={cn(
-      'glass-card p-5 rounded-xl transition-all duration-300 animate-fade-in',
-      className
-    )}>
+    <div 
+      className={cn(
+        'glass-card p-5 rounded-xl transition-all duration-300 animate-fade-in',
+        onClick && 'hover:bg-gray-50',
+        className
+      )}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
       <div className="flex items-start justify-between">
         <div className="flex flex-col w-full">
           <h3 className="text-sm font-medium text-gray-500">{title}</h3>

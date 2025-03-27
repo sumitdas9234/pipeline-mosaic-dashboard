@@ -397,8 +397,108 @@ export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineS
   };
 };
 
-// Mock API functions
-export const fetchProducts = (): Promise<Product[]> => {
+// Helper function to generate a random commit ID
+const generateCommitId = () => {
+  const chars = 'abcdef0123456789';
+  let result = '';
+  for (let i = 0; i < 40; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+// Helper function to generate a random SHA digest
+const generateShaDigest = () => {
+  const chars = 'abcdef0123456789';
+  let result = 'sha256:';
+  for (let i = 0; i < 64; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+// Helper to generate random repository details
+const getRepositoryDetails = (productName: string) => {
+  const repos = [
+    'github.com/myorg/frontend-web',
+    'github.com/myorg/backend-api',
+    'github.com/myorg/data-service',
+    'github.com/myorg/auth-service',
+    'github.com/myorg/notification-service'
+  ];
+  
+  const branches = [
+    'main',
+    'develop',
+    'feature/auth-improvements',
+    'hotfix/security-patch',
+    'release/v2.0'
+  ];
+  
+  const authors = [
+    'John Doe <john.doe@example.com>',
+    'Jane Smith <jane.smith@example.com>',
+    'Mike Johnson <mike.johnson@example.com>',
+    'Sarah Williams <sarah.williams@example.com>',
+    'Alex Brown <alex.brown@example.com>'
+  ];
+  
+  return {
+    commitId: generateCommitId(),
+    repositoryUrl: `https://${repos[Math.floor(Math.random() * repos.length)]}`,
+    branch: branches[Math.floor(Math.random() * branches.length)],
+    author: authors[Math.floor(Math.random() * authors.length)]
+  };
+};
+
+// Helper to generate random artifact details
+const getArtifactDetails = (productName: string, buildNumber: string) => {
+  const artifactNames = [
+    'api-service',
+    'web-frontend',
+    'data-processor',
+    'auth-service',
+    'notification-service'
+  ];
+  
+  const name = artifactNames[Math.floor(Math.random() * artifactNames.length)];
+  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
+  const commitId = generateCommitId().substring(0, 8);
+  
+  return {
+    name,
+    imageUrl: `container-registry.com/${sanitizedProductName}/${name}:${buildNumber}-${commitId}`,
+    shaDigest: generateShaDigest()
+  };
+};
+
+// Helper to generate enhanced build data
+const generateEnhancedBuildData = (productName: string, buildNumber: string, status: 'passed' | 'failed' | 'inprogress') => {
+  const baseUrl = 'https://jenkins.example.com';
+  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
+  
+  // Generate 1-3 commit details
+  const commitCount = Math.floor(Math.random() * 3) + 1;
+  const commitDetails = [];
+  for (let i = 0; i < commitCount; i++) {
+    commitDetails.push(getRepositoryDetails(productName));
+  }
+  
+  // Generate 1-3 artifacts
+  const artifactCount = Math.floor(Math.random() * 3) + 1;
+  const artifacts = [];
+  for (let i = 0; i < artifactCount; i++) {
+    artifacts.push(getArtifactDetails(productName, buildNumber));
+  }
+  
+  return {
+    commitDetails,
+    artifacts,
+    jenkinsUrl: `${baseUrl}/job/${sanitizedProductName}/job/build-${buildNumber}`
+  };
+};
+
+export const fetchProducts = async (): Promise<Product[]> => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(products);
@@ -406,10 +506,10 @@ export const fetchProducts = (): Promise<Product[]> => {
   });
 };
 
-export const fetchPipelines = (
-  productId?: string | null,
-  releaseId?: string | null,
-  buildId?: string | null
+export const fetchPipelines = async (
+  productId: string | null = null,
+  releaseId: string | null = null,
+  buildId: string | null = null
 ): Promise<Pipeline[]> => {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -432,10 +532,10 @@ export const fetchPipelines = (
   });
 };
 
-export const fetchPipelineStats = (
-  productId?: string | null,
-  releaseId?: string | null,
-  buildId?: string | null
+export const fetchPipelineStats = async (
+  productId: string | null = null,
+  releaseId: string | null = null,
+  buildId: string | null = null
 ): Promise<PipelineStats> => {
   return new Promise(resolve => {
     setTimeout(async () => {
@@ -443,4 +543,34 @@ export const fetchPipelineStats = (
       resolve(calculatePipelineStats(filteredPipelines));
     }, 300);
   });
+};
+
+export const fetchBuildDetails = async (buildId: string): Promise<Build | null> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  try {
+    // Find the product that contains this build
+    for (const product of mockProducts) {
+      for (const release of product.releases) {
+        const build = release.builds.find(b => b.id === buildId);
+        if (build) {
+          const enhancedData = generateEnhancedBuildData(
+            product.name,
+            build.buildNumber,
+            build.status
+          );
+          
+          return {
+            ...build,
+            ...enhancedData
+          };
+        }
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching build details:', error);
+    return null;
+  }
 };
