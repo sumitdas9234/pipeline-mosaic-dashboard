@@ -122,3 +122,44 @@ html, body {
   border-radius: 2px;
   transition: width 0.3s ease;
 }
+
+/* Status color utilities */
+.text-status-passed {
+  color: #16a34a; /* green-600 */
+}
+
+.text-status-failed {
+  color: #e11d48; /* rose-600 */
+}
+
+.text-status-aborted {
+  color: #71717a; /* zinc-500 */
+}
+
+.text-status-pending {
+  color: #d97706; /* amber-600 */
+}
+
+.text-status-inprogress {
+  color: #2563eb; /* blue-600 */
+}
+
+.bg-status-passed {
+  background-color: #16a34a; /* green-600 */
+}
+
+.bg-status-failed {
+  background-color: #e11d48; /* rose-600 */
+}
+
+.bg-status-aborted {
+  background-color: #71717a; /* zinc-500 */
+}
+
+.bg-status-pending {
+  background-color: #d97706; /* amber-600 */
+}
+
+.bg-status-inprogress {
+  background-color: #2563eb; /* blue-600 */
+}

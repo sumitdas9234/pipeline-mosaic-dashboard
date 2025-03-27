@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pipeline } from '@/types';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { 
   Table, 
   TableBody, 
@@ -28,12 +29,14 @@ export function PipelineTable({
 }: PipelineTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showOnlyFailed, setShowOnlyFailed] = useState(true);
 
   const filteredPipelines = pipelines.filter(pipeline => {
     const matchesSearch = pipeline.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          pipeline.owner.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || pipeline.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesFailed = !showOnlyFailed || pipeline.status === 'failed';
+    return matchesSearch && matchesStatus && matchesFailed;
   });
 
   const renderProgressBar = (passed: number, total: number) => {
@@ -71,7 +74,7 @@ export function PipelineTable({
       return (
         <TableRow>
           <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-            {searchTerm || statusFilter !== 'all' ? 
+            {searchTerm || statusFilter !== 'all' || showOnlyFailed ? 
               'No pipelines match your filters' : 
               'No pipelines available'}
           </TableCell>
@@ -143,7 +146,20 @@ export function PipelineTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-24">Status</TableHead>
+              <TableHead className="w-24">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    <Switch 
+                      checked={!showOnlyFailed} 
+                      onCheckedChange={(checked) => setShowOnlyFailed(!checked)} 
+                      className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-500">
+                      {showOnlyFailed ? 'Failed Only' : 'Show All'}
+                    </span>
+                  </div>
+                </div>
+              </TableHead>
               <TableHead>Pipeline</TableHead>
               <TableHead className="w-36">Date</TableHead>
               <TableHead className="w-28">Duration</TableHead>
