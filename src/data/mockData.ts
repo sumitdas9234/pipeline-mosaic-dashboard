@@ -1,4 +1,5 @@
-import { Product, Pipeline, PipelineStats } from '@/types';
+
+import { Product, Pipeline, PipelineStats, Build } from '@/types';
 
 export const products: Product[] = [
   {
@@ -9,17 +10,57 @@ export const products: Product[] = [
         id: 'release-1.1.0',
         name: '1.1.0',
         builds: [
-          { id: 'build-1000', buildNumber: '1000', date: '2023-06-10' },
-          { id: 'build-1001', buildNumber: '1001', date: '2023-06-11' },
-          { id: 'build-1006', buildNumber: '1006', date: '2023-06-12' },
+          { 
+            id: 'build-1000', 
+            buildNumber: '1000', 
+            date: '2023-06-10',
+            status: 'passed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1000'
+          },
+          { 
+            id: 'build-1001', 
+            buildNumber: '1001', 
+            date: '2023-06-11',
+            status: 'passed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1001'
+          },
+          { 
+            id: 'build-1006', 
+            buildNumber: '1006', 
+            date: '2023-06-12',
+            status: 'inprogress',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1006'
+          },
         ]
       },
       {
         id: 'release-1.2.0',
         name: '1.2.0',
         builds: [
-          { id: 'build-1234', buildNumber: '1234', date: '2023-06-15' },
-          { id: 'build-1235', buildNumber: '1235', date: '2023-06-16' },
+          { 
+            id: 'build-1234', 
+            buildNumber: '1234', 
+            date: '2023-06-15',
+            status: 'failed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1234'
+          },
+          { 
+            id: 'build-1235', 
+            buildNumber: '1235', 
+            date: '2023-06-16',
+            status: 'passed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1235'
+          },
         ]
       }
     ]
@@ -32,22 +73,54 @@ export const products: Product[] = [
         id: 'release-2.2.1',
         name: '2.2.1',
         builds: [
-          { id: 'build-1002', buildNumber: '1002', date: '2023-06-10' },
-          { id: 'build-1003', buildNumber: '1003', date: '2023-06-11' },
+          { 
+            id: 'build-1002', 
+            buildNumber: '1002', 
+            date: '2023-06-10',
+            status: 'failed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1002'
+          },
+          { 
+            id: 'build-1003', 
+            buildNumber: '1003', 
+            date: '2023-06-11',
+            status: 'failed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1003'
+          },
         ]
       },
       {
         id: 'release-2.3.0',
         name: '2.3.0',
         builds: [
-          { id: 'build-1007', buildNumber: '1007', date: '2023-06-13' },
+          { 
+            id: 'build-1007', 
+            buildNumber: '1007', 
+            date: '2023-06-13',
+            status: 'passed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1007'
+          },
         ]
       },
       {
         id: 'release-2.3.0.1',
         name: '2.3.0.1',
         builds: [
-          { id: 'build-1008', buildNumber: '1008', date: '2023-06-14' },
+          { 
+            id: 'build-1008', 
+            buildNumber: '1008', 
+            date: '2023-06-14',
+            status: 'passed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1008'
+          },
         ]
       }
     ]
@@ -60,9 +133,33 @@ export const products: Product[] = [
         id: 'release-3.2.0',
         name: '3.2.0',
         builds: [
-          { id: 'build-1004', buildNumber: '1004', date: '2023-06-10' },
-          { id: 'build-1005', buildNumber: '1005', date: '2023-06-11' },
-          { id: 'build-1008', buildNumber: '1008', date: '2023-06-12' },
+          { 
+            id: 'build-1004', 
+            buildNumber: '1004', 
+            date: '2023-06-10',
+            status: 'inprogress',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1004'
+          },
+          { 
+            id: 'build-1005', 
+            buildNumber: '1005', 
+            date: '2023-06-11',
+            status: 'failed',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1005'
+          },
+          { 
+            id: 'build-1008', 
+            buildNumber: '1008', 
+            date: '2023-06-12',
+            status: 'inprogress',
+            commitDetails: [],
+            artifacts: [],
+            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1008'
+          },
         ]
       }
     ]
@@ -551,7 +648,7 @@ export const fetchBuildDetails = async (buildId: string): Promise<Build | null> 
   
   try {
     // Find the product that contains this build
-    for (const product of mockProducts) {
+    for (const product of products) {
       for (const release of product.releases) {
         const build = release.builds.find(b => b.id === buildId);
         if (build) {
