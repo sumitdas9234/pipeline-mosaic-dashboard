@@ -6,7 +6,7 @@ import { MetricCard } from '../common/MetricCard';
 import { PipelineTable } from './PipelineTable';
 import { usePipelineData } from '@/hooks/usePipelineData';
 import { useBuildDetails } from '@/hooks/useBuildDetails';
-import { BuildDetailSheet } from './BuildDetailSheet';
+import { BuildDetailSheet } from './build-detail/BuildDetailSheet';
 import { Progress } from '@/components/ui/progress';
 import { Bug, Clock } from 'lucide-react';
 

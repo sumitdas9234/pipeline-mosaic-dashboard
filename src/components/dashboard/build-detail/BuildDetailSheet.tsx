@@ -15,6 +15,7 @@ import { ProductInfoCard } from './ProductInfoCard';
 import { BuildStatsTab } from './BuildStatsTab';
 import { CommitsTab } from './CommitsTab';
 import { ArtifactsTab } from './ArtifactsTab';
+import { PieChart, GitCommit, Archive } from 'lucide-react';
 
 interface BuildDetailSheetProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[90%] sm:w-[540px] lg:w-[40%] overflow-y-auto font-sans">
+      <SheetContent className="w-[95%] sm:w-[600px] lg:w-[50%] xl:w-[45%] overflow-y-auto font-sans">
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center space-x-2">
             <span>Build {build.buildNumber}</span>
@@ -124,5 +125,3 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
     </Sheet>
   );
 }
-
-import { PieChart, GitCommit, Archive } from 'lucide-react';

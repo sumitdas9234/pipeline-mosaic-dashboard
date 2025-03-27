@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Cell, Pie, PieChart as RechartsPieChart } from 'recharts';
+import { Cell, Pie, PieChart as RechartsPieChart, Legend } from 'recharts';
 import { ExternalLink } from 'lucide-react';
 import { Build } from '@/types';
 
@@ -60,7 +60,7 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
         fill="#fff" 
         textAnchor={x > cx ? 'start' : 'end'} 
         dominantBaseline="central"
-        className="text-xs font-sans"
+        className="text-xs font-sans font-medium"
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -74,17 +74,17 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
           <CardTitle className="text-base">Pipeline Stats</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[280px] w-full">
-            <ChartContainer config={chartConfig}>
-              <RechartsPieChart>
+          <div className="h-[320px] w-full flex justify-center items-center">
+            <ChartContainer config={chartConfig} className="w-full max-w-[400px]">
+              <RechartsPieChart width={400} height={300} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
                   label={renderCustomizedLabel}
-                  outerRadius={100}
-                  innerRadius={50}
+                  outerRadius={120}
+                  innerRadius={60}
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
@@ -99,7 +99,7 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
               </RechartsPieChart>
             </ChartContainer>
           </div>
-          <div className="flex justify-center gap-4 mt-2">
+          <div className="flex justify-center gap-4 mt-4">
             <div className="flex items-center gap-1">
               <div className="h-3 w-3 rounded-full bg-status-passed"></div>
               <span className="text-sm">Passed: {pipelineStats.passed}</span>
