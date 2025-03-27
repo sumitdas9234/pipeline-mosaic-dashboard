@@ -12,7 +12,7 @@ import { Check, X, Play, ExternalLink, GitBranch, GitCommit, Package, PieChart, 
 import { Build } from '@/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer } from 'recharts';
+import { Cell, Pie, PieChart as RechartsPieChart } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface BuildDetailSheetProps {
@@ -71,6 +71,21 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
     { name: 'Failed', value: pipelineStats.failed, color: '#EF4444' }, // Red for fail
     { name: 'In Progress', value: pipelineStats.inprogress, color: '#F97316' } // Amber for in progress
   ].filter(item => item.value > 0) : [];
+
+  const chartConfig = {
+    passed: { 
+      color: '#10B981',
+      label: 'Passed'
+    },
+    failed: { 
+      color: '#EF4444',
+      label: 'Failed'
+    },
+    inprogress: { 
+      color: '#F97316',
+      label: 'In Progress'
+    }
+  };
 
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({ 
@@ -163,7 +178,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
                 </CardHeader>
                 <CardContent>
                   <div className="h-[280px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ChartContainer config={chartConfig}>
                       <RechartsPieChart>
                         <Pie
                           data={chartData}
@@ -175,6 +190,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
                           innerRadius={50}
                           fill="#8884d8"
                           dataKey="value"
+                          nameKey="name"
                         >
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -184,7 +200,7 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
                           content={<ChartTooltipContent />}
                         />
                       </RechartsPieChart>
-                    </ResponsiveContainer>
+                    </ChartContainer>
                   </div>
                   <div className="flex justify-center gap-4 mt-2">
                     <div className="flex items-center gap-1">
