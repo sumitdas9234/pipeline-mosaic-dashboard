@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Cell, Pie, PieChart as RechartsPieChart, Legend } from 'recharts';
+import { Cell, Pie, PieChart as RechartsPieChart } from 'recharts';
 import { ExternalLink } from 'lucide-react';
 import { Build } from '@/types';
 
@@ -74,17 +74,19 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
           <CardTitle className="text-base">Pipeline Stats</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[320px] w-full flex justify-center items-center">
-            <ChartContainer config={chartConfig} className="w-full max-w-[400px]">
-              <RechartsPieChart width={400} height={300} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
+          {/* Increased height and improved centering for chart container */}
+          <div className="h-[360px] w-full flex justify-center items-center">
+            <ChartContainer config={chartConfig} className="w-full max-w-[450px]">
+              {/* Fixed dimensions and increased margins for better visibility */}
+              <RechartsPieChart width={450} height={300} margin={{ top: 30, right: 40, left: 40, bottom: 30 }}>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
                   label={renderCustomizedLabel}
-                  outerRadius={120}
-                  innerRadius={60}
+                  outerRadius={110}
+                  innerRadius={55}
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
@@ -99,19 +101,17 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
               </RechartsPieChart>
             </ChartContainer>
           </div>
-          <div className="flex justify-center gap-4 mt-4">
-            <div className="flex items-center gap-1">
-              <div className="h-3 w-3 rounded-full bg-status-passed"></div>
-              <span className="text-sm">Passed: {pipelineStats.passed}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="h-3 w-3 rounded-full bg-status-failed"></div>
-              <span className="text-sm">Failed: {pipelineStats.failed}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="h-3 w-3 rounded-full bg-status-inprogress"></div>
-              <span className="text-sm">In Progress: {pipelineStats.inprogress}</span>
-            </div>
+          
+          {/* More space between chart and legend, better flex layout for legend */}
+          <div className="flex justify-center items-center gap-6 mt-6">
+            {chartData.map(item => (
+              <div key={item.name} className="flex items-center gap-2">
+                <div className="h-4 w-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                <span className="text-sm whitespace-nowrap">
+                  {item.name}: {item.value}
+                </span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
