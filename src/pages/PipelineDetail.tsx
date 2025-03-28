@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
@@ -14,7 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PipelineDetail, TestItem } from '@/types';
 import { fetchPipelineDetail } from '@/data/mockPipelineDetails';
-import { ChevronLeft, Calendar, User, Server, Play, Info, BugIcon, MessageSquare, Tag, CheckIcon } from 'lucide-react';
+import { ChevronLeft, Calendar, User, Server, Play, Info, BugIcon, MessageSquare, Tag, CheckIcon, ExternalLink } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const PipelineDetailPage: React.FC = () => {
@@ -332,12 +333,9 @@ const PipelineDetailPage: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="w-16 text-xs font-medium">Step</TableHead>
                   <TableHead className="text-xs font-medium">Testcase</TableHead>
-                  <TableHead className="w-8 text-center text-xs font-medium">T</TableHead>
                   <TableHead className="text-xs font-medium">Description</TableHead>
-                  <TableHead className="w-8 text-center text-xs font-medium">T</TableHead>
-                  <TableHead className="text-xs font-medium">TestRunURL</TableHead>
+                  <TableHead className="w-20 text-xs font-medium">Run URL</TableHead>
                   <TableHead className="w-24 text-xs font-medium">Duration</TableHead>
                   <TableHead className="w-24 text-xs font-medium">Status</TableHead>
                 </TableRow>
@@ -346,23 +344,24 @@ const PipelineDetailPage: React.FC = () => {
                 {pipeline.testItems.map((test) => (
                   <React.Fragment key={test.id}>
                     <TableRow className="hover:bg-gray-50 cursor-pointer" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
-                      <TableCell className="text-sm">{test.step || '-'}</TableCell>
                       <TableCell className="text-sm font-medium">
                         {test.name}
-                        {test.testRunUrl && (
-                          <span className="text-xs text-blue-600 ml-2">({test.testRunUrl})</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
                       </TableCell>
                       <TableCell className="text-sm">{test.description || '-'}</TableCell>
-                      <TableCell className="text-center">
-                        <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
-                      </TableCell>
-                      <TableCell className="text-sm text-blue-600 hover:underline">
+                      <TableCell>
                         {test.testRunUrl ? (
-                          <span className="cursor-pointer">{test.testRunUrl}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 px-2 text-xs text-blue-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(test.testRunUrl, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
                         ) : '-'}
                       </TableCell>
                       <TableCell className="text-sm">{test.duration}</TableCell>
@@ -371,7 +370,7 @@ const PipelineDetailPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={8} className="p-0 border-b">
+                      <TableCell colSpan={5} className="p-0 border-b">
                         <Accordion type="single" collapsible className="w-full">
                           <AccordionItem value={test.id} className="border-0">
                             <AccordionTrigger 
