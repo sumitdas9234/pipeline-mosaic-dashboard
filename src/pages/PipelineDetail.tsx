@@ -58,7 +58,7 @@ const PipelineDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <main className="flex-1 w-[90%] mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 w-64 bg-gray-200 rounded mb-6"></div>
             <div className="h-32 bg-gray-200 rounded mb-6"></div>
@@ -73,7 +73,7 @@ const PipelineDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <main className="flex-1 w-[90%] mx-auto px-4 py-8">
           <div className="bg-white p-8 rounded-xl shadow text-center">
             <h2 className="text-2xl font-semibold mb-4">Error</h2>
             <p className="text-gray-600 mb-6">{error || 'Pipeline not found'}</p>
@@ -94,7 +94,7 @@ const PipelineDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 w-[90%] mx-auto px-4 py-8">
         {/* Back button */}
         <Link to="/" className="inline-flex items-center text-primary mb-6 hover:underline">
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -258,32 +258,32 @@ const PipelineDetailPage: React.FC = () => {
 
         {/* Log Links as Buttons */}
         <div className="flex gap-2 mb-6 flex-wrap">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <FileCode className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <FileCode className="h-3.5 w-3.5" />
             Jenkins
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Terminal className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Terminal className="h-3.5 w-3.5" />
             Jenkins Console
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Server className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Server className="h-3.5 w-3.5" />
             Aetos Logs
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Database className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Database className="h-3.5 w-3.5" />
             KubeConfig
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Play className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Play className="h-3.5 w-3.5" />
             Blue Ocean
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Calendar className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Calendar className="h-3.5 w-3.5" />
             Stats
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Server className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Server className="h-3.5 w-3.5" />
             KubeDashboard
           </Button>
         </div>
