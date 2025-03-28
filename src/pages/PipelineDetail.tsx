@@ -218,6 +218,7 @@ const PipelineDetailPage: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="border-t pt-4 pb-2 flex-col items-start gap-4">
+            {/* Progress bar section */}
             <div className="w-full">
               <div className="flex justify-between items-center mb-1.5">
                 <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -229,10 +230,14 @@ const PipelineDetailPage: React.FC = () => {
                   {passedTests} of {totalTests} tests passed
                 </div>
               </div>
-              <Progress value={passPercentage} className="h-2" />
+              <Progress value={passPercentage} className="h-2 bg-gray-100">
+                <div className="h-full bg-status-passed" style={{ width: `${passPercentage}%` }} />
+              </Progress>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            {/* Three column footer layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+              {/* Column 1: Timing */}
               <div className="flex gap-2 items-start">
                 <Clock className="h-4 w-4 text-gray-400 mt-0.5" />
                 <div>
@@ -245,6 +250,20 @@ const PipelineDetailPage: React.FC = () => {
                 </div>
               </div>
               
+              {/* Column 2: Environment */}
+              <div className="flex gap-2 items-start">
+                <Server className="h-4 w-4 text-gray-400 mt-0.5" />
+                <div>
+                  <div className="text-sm font-medium">Environment</div>
+                  <div className="text-xs text-gray-500">
+                    Env: {pipeline.environment || 'N/A'}<br/>
+                    Trigger: {pipeline.trigger || 'N/A'}<br/>
+                    User: {pipeline.user || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Column 3: Tags */}
               <div className="flex gap-2 items-start">
                 <Tag className="h-4 w-4 text-gray-400 mt-0.5" />
                 <div className="w-full">
@@ -317,28 +336,34 @@ const PipelineDetailPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="text-xs font-medium">Testcase</TableHead>
-                <TableHead className="text-xs font-medium">Description</TableHead>
-                <TableHead className="w-20 text-xs font-medium">Run URL</TableHead>
-                <TableHead className="w-24 text-xs font-medium">Duration</TableHead>
-                <TableHead className="w-24 text-xs font-medium">Status</TableHead>
-                <TableHead className="w-32 text-xs font-medium">History</TableHead>
+                <TableHead className="text-xs font-medium py-2 h-8">Testcase</TableHead>
+                <TableHead className="text-xs font-medium py-2 h-8">Description</TableHead>
+                <TableHead className="text-xs font-medium py-2 h-8">History</TableHead>
+                <TableHead className="w-20 text-xs font-medium py-2 h-8">Run URL</TableHead>
+                <TableHead className="w-24 text-xs font-medium py-2 h-8">Duration</TableHead>
+                <TableHead className="w-24 text-xs font-medium py-2 h-8">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pipeline.testItems.map((test) => (
                 <React.Fragment key={test.id}>
-                  <TableRow className="hover:bg-gray-50 cursor-pointer" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
-                    <TableCell className="text-sm font-medium">
+                  <TableRow className="hover:bg-gray-50 cursor-pointer h-10" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
+                    <TableCell className="text-sm font-medium py-2">
                       {test.name}
                     </TableCell>
-                    <TableCell className="text-sm">{test.description || '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-sm py-2">{test.description || '-'}</TableCell>
+                    <TableCell className="py-2">
+                      <StatusHistory 
+                        history={test.history || [test.status, test.status === 'passed' ? 'failed' : 'passed', test.status]} 
+                        className="min-w-32"
+                      />
+                    </TableCell>
+                    <TableCell className="py-2">
                       {test.testRunUrl ? (
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="h-8 px-2 text-xs text-blue-600"
+                          className="h-6 px-2 text-xs text-blue-600"
                           onClick={(e) => {
                             e.stopPropagation();
                             window.open(test.testRunUrl, '_blank');
@@ -349,15 +374,9 @@ const PipelineDetailPage: React.FC = () => {
                         </Button>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-sm">{test.duration}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-sm py-2">{test.duration}</TableCell>
+                    <TableCell className="py-2">
                       <StatusBadge status={test.status} size="sm" />
-                    </TableCell>
-                    <TableCell>
-                      <StatusHistory 
-                        history={test.history || [test.status, test.status === 'passed' ? 'failed' : 'passed', test.status]} 
-                        className="min-w-32"
-                      />
                     </TableCell>
                   </TableRow>
                   <TableRow>
