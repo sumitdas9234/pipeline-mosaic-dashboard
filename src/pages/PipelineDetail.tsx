@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { StatusHistory } from '@/components/common/StatusHistory';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
   Accordion,
   AccordionContent,
@@ -90,6 +92,11 @@ const PipelineDetailPage: React.FC = () => {
   const overallStatus = pipeline.testItems.some(test => test.status === 'failed') 
     ? 'failed' 
     : pipeline.status;
+    
+  // Calculate pass percentage for progress bar
+  const passedTests = pipeline.testItems.filter(test => test.status === 'passed').length;
+  const totalTests = pipeline.testItems.length;
+  const passPercentage = totalTests > 0 ? (passedTests / totalTests) * 100 : 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -137,18 +144,6 @@ const PipelineDetailPage: React.FC = () => {
                     <div>
                       <div className="text-sm font-medium">Test Type</div>
                       <div className="text-xs text-gray-500">{pipeline.testType || 'Standard'}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 items-start">
-                    <Clock className="h-4 w-4 text-gray-400 mt-0.5" />
-                    <div>
-                      <div className="text-sm font-medium">Timing</div>
-                      <div className="text-xs text-gray-500">
-                        Start: {pipeline.startTime || 'N/A'}<br/>
-                        End: {pipeline.endTime || 'N/A'}<br/>
-                        Duration: {pipeline.duration || 'N/A'}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -218,27 +213,56 @@ const PipelineDetailPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex flex-wrap items-start gap-2">
-                    <Tag className="h-4 w-4 text-gray-400 mt-0.5" />
-                    <div className="w-full">
-                      <div className="text-sm font-medium mb-1">Tags</div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {pipeline.tags && pipeline.tags.length > 0 ? 
-                          pipeline.tags.map((tag, index) => (
-                            <Badge key={index} variant="outline" className="bg-gray-50 text-gray-700">
-                              {tag}
-                            </Badge>
-                          )) : 
-                          <span className="text-xs text-gray-500">No tags</span>
-                        }
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
+          <CardFooter className="border-t pt-4 pb-2 flex-col items-start gap-4">
+            <div className="w-full">
+              <div className="flex justify-between items-center mb-1.5">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span>Test Pass Rate:</span>
+                  <span className="font-medium">{passPercentage.toFixed(0)}%</span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {passedTests} of {totalTests} tests passed
+                </div>
+              </div>
+              <Progress value={passPercentage} className="h-2" />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              <div className="flex gap-2 items-start">
+                <Clock className="h-4 w-4 text-gray-400 mt-0.5" />
+                <div>
+                  <div className="text-sm font-medium">Timing</div>
+                  <div className="text-xs text-gray-500">
+                    Start: {pipeline.startTime || 'N/A'}<br/>
+                    End: {pipeline.endTime || 'N/A'}<br/>
+                    Duration: {pipeline.duration || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 items-start">
+                <Tag className="h-4 w-4 text-gray-400 mt-0.5" />
+                <div className="w-full">
+                  <div className="text-sm font-medium mb-1">Tags</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {pipeline.tags && pipeline.tags.length > 0 ? 
+                      pipeline.tags.map((tag, index) => (
+                        <Badge key={index} variant="subtle" className="text-xs">
+                          {tag}
+                        </Badge>
+                      )) : 
+                      <span className="text-xs text-gray-500">No tags</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardFooter>
         </Card>
 
         {/* Actions Bar */}
@@ -298,6 +322,7 @@ const PipelineDetailPage: React.FC = () => {
                 <TableHead className="w-20 text-xs font-medium">Run URL</TableHead>
                 <TableHead className="w-24 text-xs font-medium">Duration</TableHead>
                 <TableHead className="w-24 text-xs font-medium">Status</TableHead>
+                <TableHead className="w-32 text-xs font-medium">History</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -328,9 +353,15 @@ const PipelineDetailPage: React.FC = () => {
                     <TableCell>
                       <StatusBadge status={test.status} size="sm" />
                     </TableCell>
+                    <TableCell>
+                      <StatusHistory 
+                        history={test.history || [test.status, test.status === 'passed' ? 'failed' : 'passed', test.status]} 
+                        className="min-w-32"
+                      />
+                    </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={5} className="p-0 border-b">
+                    <TableCell colSpan={6} className="p-0 border-b">
                       <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value={test.id} className="border-0">
                           <AccordionTrigger 

@@ -82,6 +82,7 @@ export interface TestItem {
   step?: number; // Add step number for ordering
   testRunUrl?: string; // Add URL for test details
   description?: string; // Add description
+  history?: Status[]; // Add history for test execution
 }
 
 export interface PipelineDetail extends Pipeline {

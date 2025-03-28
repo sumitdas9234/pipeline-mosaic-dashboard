@@ -1,4 +1,3 @@
-
 import { PipelineDetail, Status, TestItem } from '@/types';
 
 // Helper function to generate log content based on test status
@@ -21,7 +20,57 @@ const generateLogContent = (testName: string, status: Status): string => {
   }
 };
 
-// Generate test items for a pipeline
+// Generate detailed test cases like in the image
+const generateDetailedTestCases = (pipelineId: string): TestItem[] => {
+  return [
+    {
+      id: `test-${pipelineId}-1`,
+      name: 'TestbedDeployment',
+      status: 'passed',
+      duration: '1m 34s',
+      logs: 'Testbed deployment logs...',
+      step: 1,
+      testRunUrl: 'jenkins-history',
+      description: 'Testbed Deployment',
+      history: ['passed', 'passed', 'failed', 'passed', 'passed']
+    },
+    {
+      id: `test-${pipelineId}-2`,
+      name: 'InstallK8s',
+      status: 'passed',
+      duration: '1m 28s',
+      logs: 'K8s installation logs...',
+      step: 2,
+      testRunUrl: 'jenkins-history',
+      description: 'K8S install - v1.31.0',
+      history: ['passed', 'passed', 'passed', 'failed', 'passed']
+    },
+    {
+      id: `test-${pipelineId}-3`,
+      name: 'PWXInstall',
+      status: 'passed',
+      duration: '1m 55s',
+      logs: 'PWX installation logs...',
+      step: 3,
+      testRunUrl: 'jenkins-history',
+      description: 'Install 3.2.2 Portworx on a Kubernetes cluster',
+      history: ['passed', 'failed', 'passed', 'passed', 'passed']
+    },
+    {
+      id: `test-${pipelineId}-4`,
+      name: 'VCenterCleanup',
+      status: 'passed',
+      duration: '0s',
+      logs: 'VCenter cleanup logs...',
+      step: 4,
+      testRunUrl: 'jenkins-history',
+      description: 'Destroy all resources for a given stack on vCenter',
+      history: ['passed', 'passed', 'passed', 'passed', 'failed']
+    }
+  ];
+};
+
+// Update the function to include history in generated test items
 const generateTestItems = (pipelineId: string, totalTests: number, passedTests: number) => {
   const testItems: TestItem[] = [];
   const statuses: Status[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
@@ -39,6 +88,12 @@ const generateTestItems = (pipelineId: string, totalTests: number, passedTests: 
     
     const testName = `Test-${pipelineId}-${i}`;
     
+    // Generate random history
+    const randomHistory: Status[] = [];
+    for (let j = 0; j < 5; j++) {
+      randomHistory.push(statuses[Math.floor(Math.random() * statuses.length)]);
+    }
+    
     testItems.push({
       id: `test-${pipelineId}-${i}`,
       name: testName,
@@ -47,57 +102,12 @@ const generateTestItems = (pipelineId: string, totalTests: number, passedTests: 
       logs: generateLogContent(testName, status),
       step: i,
       testRunUrl: `https://jenkins.example.com/job/test-${pipelineId}/${i}`,
-      description: `Description for ${testName}`
+      description: `Description for ${testName}`,
+      history: randomHistory
     });
   }
   
   return testItems;
-};
-
-// Generate detailed test cases like in the image
-const generateDetailedTestCases = (pipelineId: string): TestItem[] => {
-  return [
-    {
-      id: `test-${pipelineId}-1`,
-      name: 'TestbedDeployment',
-      status: 'passed',
-      duration: '1m 34s',
-      logs: 'Testbed deployment logs...',
-      step: 1,
-      testRunUrl: 'jenkins-history',
-      description: 'Testbed Deployment'
-    },
-    {
-      id: `test-${pipelineId}-2`,
-      name: 'InstallK8s',
-      status: 'passed',
-      duration: '1m 28s',
-      logs: 'K8s installation logs...',
-      step: 2,
-      testRunUrl: 'jenkins-history',
-      description: 'K8S install - v1.31.0'
-    },
-    {
-      id: `test-${pipelineId}-3`,
-      name: 'PWXInstall',
-      status: 'passed',
-      duration: '1m 55s',
-      logs: 'PWX installation logs...',
-      step: 3,
-      testRunUrl: 'jenkins-history',
-      description: 'Install 3.2.2 Portworx on a Kubernetes cluster'
-    },
-    {
-      id: `test-${pipelineId}-4`,
-      name: 'VCenterCleanup',
-      status: 'passed',
-      duration: '0s',
-      logs: 'VCenter cleanup logs...',
-      step: 4,
-      testRunUrl: 'jenkins-history',
-      description: 'Destroy all resources for a given stack on vCenter'
-    }
-  ];
 };
 
 // Function to fetch pipeline detail by ID
