@@ -15,6 +15,12 @@ export interface Pipeline {
   platformIssues?: number;
   history?: Status[]; // Added history field
   testsetId: string; // Add this new field
+  suiteId?: string; // Add suite ID
+  branch?: string; // Add branch information
+  description?: string; // Add description
+  lastSuccess?: string; // Add last success information
+  startTime?: string; // Add specific start time
+  endTime?: string; // Add specific end time
 }
 
 export interface Product {
@@ -73,6 +79,9 @@ export interface TestItem {
   status: Status;
   duration: string;
   logs: string;
+  step?: number; // Add step number for ordering
+  testRunUrl?: string; // Add URL for test details
+  description?: string; // Add description
 }
 
 export interface PipelineDetail extends Pipeline {
@@ -82,4 +91,11 @@ export interface PipelineDetail extends Pipeline {
   trigger?: string;
   startTime?: string;
   endTime?: string;
+  user?: string; // Add user who ran the pipeline
+  testType?: string; // Add test type
+  bugs?: string[]; // Add bugs information
+  comments?: string[]; // Add comments
+  testbedDetails?: string; // Add testbed details
+  tags?: string[]; // Add tags
+  testCaseCount?: number; // Add test case count
 }

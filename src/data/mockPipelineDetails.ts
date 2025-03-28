@@ -1,5 +1,5 @@
 
-import { PipelineDetail, Status } from '@/types';
+import { PipelineDetail, Status, TestItem } from '@/types';
 
 // Helper function to generate log content based on test status
 const generateLogContent = (testName: string, status: Status): string => {
@@ -23,7 +23,7 @@ const generateLogContent = (testName: string, status: Status): string => {
 
 // Generate test items for a pipeline
 const generateTestItems = (pipelineId: string, totalTests: number, passedTests: number) => {
-  const testItems = [];
+  const testItems: TestItem[] = [];
   const statuses: Status[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
   
   for (let i = 1; i <= totalTests; i++) {
@@ -44,11 +44,60 @@ const generateTestItems = (pipelineId: string, totalTests: number, passedTests: 
       name: testName,
       status,
       duration: `${(Math.random() * 5).toFixed(2)}s`,
-      logs: generateLogContent(testName, status)
+      logs: generateLogContent(testName, status),
+      step: i,
+      testRunUrl: `https://jenkins.example.com/job/test-${pipelineId}/${i}`,
+      description: `Description for ${testName}`
     });
   }
   
   return testItems;
+};
+
+// Generate detailed test cases like in the image
+const generateDetailedTestCases = (pipelineId: string): TestItem[] => {
+  return [
+    {
+      id: `test-${pipelineId}-1`,
+      name: 'TestbedDeployment',
+      status: 'passed',
+      duration: '1m 34s',
+      logs: 'Testbed deployment logs...',
+      step: 1,
+      testRunUrl: 'jenkins-history',
+      description: 'Testbed Deployment'
+    },
+    {
+      id: `test-${pipelineId}-2`,
+      name: 'InstallK8s',
+      status: 'passed',
+      duration: '1m 28s',
+      logs: 'K8s installation logs...',
+      step: 2,
+      testRunUrl: 'jenkins-history',
+      description: 'K8S install - v1.31.0'
+    },
+    {
+      id: `test-${pipelineId}-3`,
+      name: 'PWXInstall',
+      status: 'passed',
+      duration: '1m 55s',
+      logs: 'PWX installation logs...',
+      step: 3,
+      testRunUrl: 'jenkins-history',
+      description: 'Install 3.2.2 Portworx on a Kubernetes cluster'
+    },
+    {
+      id: `test-${pipelineId}-4`,
+      name: 'VCenterCleanup',
+      status: 'passed',
+      duration: '0s',
+      logs: 'VCenter cleanup logs...',
+      step: 4,
+      testRunUrl: 'jenkins-history',
+      description: 'Destroy all resources for a given stack on vCenter'
+    }
+  ];
 };
 
 // Function to fetch pipeline detail by ID
@@ -79,7 +128,9 @@ export const fetchPipelineDetail = (id: string): Promise<PipelineDetail> => {
           trigger: 'Manual',
           startTime: '2023-08-01T10:00:00',
           endTime: '2023-08-01T10:03:45',
-          testItems: generateTestItems(id, 10, 8)
+          testItems: generateTestItems(id, 10, 8),
+          suiteId: '1089922',
+          user: 'System User'
         };
         resolve(genericPipeline);
       }
@@ -91,23 +142,33 @@ export const fetchPipelineDetail = (id: string): Promise<PipelineDetail> => {
 export const MOCK_PIPELINE_DETAILS: PipelineDetail[] = [
   {
     id: 'pipe-001',
-    name: 'API Integration Tests',
+    name: 'Stork Backup CSI Functional Tests',
     status: 'passed',
-    date: '2023-08-01',
-    duration: '3m 45s',
-    tests: { passed: 12, total: 12 },
-    owner: 'Jane Smith',
+    date: '2023-03-27',
+    duration: '12m 45s',
+    tests: { passed: 4, total: 4 },
+    owner: 'pwx-bat',
     productId: 'prod-001',
     releaseId: 'rel-001',
     buildId: 'build-001',
     testsetId: 'ts-001',
     history: ['passed', 'passed', 'passed', 'failed', 'passed'],
-    description: 'Run integration tests for the API endpoints',
-    environment: 'Staging',
+    description: 'Stork Backup CSI Functional Tests',
+    environment: 'Production',
     trigger: 'Automated',
-    startTime: '2023-08-01T10:00:00',
-    endTime: '2023-08-01T10:03:45',
-    testItems: generateTestItems('pipe-001', 12, 12)
+    startTime: '2023-03-27 9:31:23 AM',
+    endTime: '2023-03-27 12:23:25 PM',
+    testItems: generateDetailedTestCases('pipe-001'),
+    suiteId: '1089922',
+    user: 'pwx-bat',
+    branch: '3.2.2',
+    testType: 'BAT',
+    lastSuccess: '1091358 (Mar 28, 2023, 12:20:08 PM)',
+    bugs: ['N/A'],
+    comments: ['N/A'],
+    testbedDetails: 'backup-csi-k8s-1-28-0-996 (Deleted)',
+    tags: ['functional', 'csi', 'backup'],
+    testCaseCount: 4
   },
   {
     id: 'pipe-002',
@@ -127,7 +188,8 @@ export const MOCK_PIPELINE_DETAILS: PipelineDetail[] = [
     trigger: 'Pull Request',
     startTime: '2023-08-02T12:15:00',
     endTime: '2023-08-02T12:17:30',
-    testItems: generateTestItems('pipe-002', 20, 18)
+    testItems: generateTestItems('pipe-002', 20, 18),
+    suiteId: '1089923'
   },
   {
     id: 'pipe-003',
@@ -147,7 +209,8 @@ export const MOCK_PIPELINE_DETAILS: PipelineDetail[] = [
     trigger: 'Manual',
     startTime: '2023-08-03T14:30:00',
     endTime: '2023-08-03T14:34:10',
-    testItems: generateTestItems('pipe-003', 15, 7)
+    testItems: generateTestItems('pipe-003', 15, 7),
+    suiteId: '1089924'
   },
   {
     id: 'pipe-004',
@@ -167,7 +230,8 @@ export const MOCK_PIPELINE_DETAILS: PipelineDetail[] = [
     trigger: 'Scheduled',
     startTime: '2023-08-04T01:00:00',
     endTime: '2023-08-04T01:10:00',
-    testItems: generateTestItems('pipe-004', 25, 5)
+    testItems: generateTestItems('pipe-004', 25, 5),
+    suiteId: '1089925'
   },
   {
     id: 'pipe-005',
@@ -187,6 +251,7 @@ export const MOCK_PIPELINE_DETAILS: PipelineDetail[] = [
     trigger: 'Deployment',
     startTime: 'Pending',
     endTime: 'Pending',
-    testItems: generateTestItems('pipe-005', 30, 0)
+    testItems: generateTestItems('pipe-005', 30, 0),
+    suiteId: '1089926'
   }
 ];
