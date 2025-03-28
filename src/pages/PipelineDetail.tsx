@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
@@ -266,7 +265,7 @@ const PipelineDetailPage: React.FC = () => {
           </Accordion>
         </div>
 
-        {/* TestCases Section */}
+        {/* Combined TestCases and Logs Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">TestCases</h2>
           
@@ -345,74 +344,57 @@ const PipelineDetailPage: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {pipeline.testItems.map((test) => (
-                  <TableRow key={test.id} className="hover:bg-gray-50">
-                    <TableCell className="text-sm">{test.step || '-'}</TableCell>
-                    <TableCell className="text-sm font-medium">
-                      {test.name}
-                      {test.testRunUrl && (
-                        <span className="text-xs text-blue-600 ml-2">({test.testRunUrl})</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
-                    </TableCell>
-                    <TableCell className="text-sm">{test.description || '-'}</TableCell>
-                    <TableCell className="text-center">
-                      <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
-                    </TableCell>
-                    <TableCell className="text-sm text-blue-600 hover:underline">
-                      {test.testRunUrl ? (
-                        <span className="cursor-pointer">{test.testRunUrl}</span>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="text-sm">{test.duration}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={test.status} size="sm" />
-                    </TableCell>
-                  </TableRow>
+                  <React.Fragment key={test.id}>
+                    <TableRow className="hover:bg-gray-50 cursor-pointer" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
+                      <TableCell className="text-sm">{test.step || '-'}</TableCell>
+                      <TableCell className="text-sm font-medium">
+                        {test.name}
+                        {test.testRunUrl && (
+                          <span className="text-xs text-blue-600 ml-2">({test.testRunUrl})</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
+                      </TableCell>
+                      <TableCell className="text-sm">{test.description || '-'}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="w-5 h-5 rounded-full bg-gray-200 mx-auto"></div>
+                      </TableCell>
+                      <TableCell className="text-sm text-blue-600 hover:underline">
+                        {test.testRunUrl ? (
+                          <span className="cursor-pointer">{test.testRunUrl}</span>
+                        ) : '-'}
+                      </TableCell>
+                      <TableCell className="text-sm">{test.duration}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={test.status} size="sm" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={8} className="p-0 border-b">
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value={test.id} className="border-0">
+                            <AccordionTrigger 
+                              id={`accordion-${test.id}`}
+                              className="hidden"
+                            />
+                            <AccordionContent>
+                              <div className="px-4 py-3 bg-gray-900 text-gray-200 font-mono text-sm rounded-md overflow-x-auto whitespace-pre">
+                                {test.logs}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
           </div>
         </div>
-
-        {/* Test Logs - Accordion style */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Test Logs</h2>
-          
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <Accordion type="multiple" className="w-full">
-              {pipeline.testItems.map((test) => (
-                <TestAccordionItem key={test.id} test={test} />
-              ))}
-            </Accordion>
-          </div>
-        </div>
       </main>
     </div>
-  );
-};
-
-interface TestAccordionItemProps {
-  test: TestItem;
-}
-
-const TestAccordionItem: React.FC<TestAccordionItemProps> = ({ test }) => {
-  return (
-    <AccordionItem value={test.id} className="border-b border-gray-100">
-      <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 transition-colors">
-        <div className="flex items-center gap-3 w-full">
-          <StatusBadge status={test.status} size="sm" />
-          <span className="font-medium">{test.name}</span>
-          <span className="ml-auto text-sm text-gray-500">{test.duration}</span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="px-4 py-3 bg-gray-900 text-gray-200 font-mono text-sm rounded-md overflow-x-auto whitespace-pre">
-          {test.logs}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
   );
 };
 
