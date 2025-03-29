@@ -6,7 +6,9 @@ import { PipelineTable } from './PipelineTable';
 import { usePipelineData } from '@/hooks/usePipelineData';
 import { useBuildDetails } from '@/hooks/useBuildDetails';
 import { BuildDetailSheet } from './build-detail/BuildDetailSheet';
+// Re-import Progress, remove Tooltip components (unless used elsewhere)
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Keep Tooltip for now, might be used elsewhere
 import { Bug, Clock } from 'lucide-react';
 
 export function Dashboard() {
@@ -59,9 +61,33 @@ export function Dashboard() {
 
   const { buildNumber, date } = getSelectedBuildInfo();
 
+  // Calculate status counts and total pipelines specifically for the selected build
+  const calculateCurrentBuildStats = () => {
+    const counts = { passed: 0, failed: 0, inprogress: 0, aborted: 0, pending: 0, total: 0 };
+    if (filters.buildId && pipelines) {
+      pipelines.forEach(p => {
+        counts.total++; // Increment total for every pipeline in the selected build
+        if (p.status === 'passed') counts.passed++;
+        else if (p.status === 'failed') counts.failed++;
+        else if (p.status === 'inprogress') counts.inprogress++;
+        else if (p.status === 'aborted') counts.aborted++;
+        else if (p.status === 'pending') counts.pending++;
+      });
+    }
+    return counts;
+  };
+
+  const currentBuildStats = calculateCurrentBuildStats();
+
+  // Calculate success rate based on the total pipelines for the current build
+  const currentBuildSuccessRate = currentBuildStats.total > 0
+    ? Math.round((currentBuildStats.passed / currentBuildStats.total) * 100)
+    : 0;
+
+
   return (
     <div className="p-6 w-[90%] mx-auto">
-      <DashboardHeader 
+      <DashboardHeader
         title="Pipeline Dashboard" 
         description="Monitor and manage your build pipelines"
       />
@@ -97,20 +123,24 @@ export function Dashboard() {
           }
         />
         
+        {/* Renamed to Total Coverage and updated display */}
         <MetricCard
-          title="Success Rate"
-          value={`${stats?.successRate || 0}%`}
+          title="Total Coverage" // Renamed title
+          value={`${currentBuildSuccessRate}%`} // Value remains success rate for main display
           icon="chart"
-          isLoading={loading.stats}
+          isLoading={loading.pipelines}
           customContent={
-            <div className="mt-2">
-              <Progress 
-                value={stats?.successRate || 0}
+            // Revert to simple Progress bar display
+            <div className="mt-2 space-y-1">
+              <Progress
+                value={currentBuildSuccessRate}
                 className="h-2"
+                // Removed invalid indicatorClassName prop
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>{stats?.status.passed || 0} passed</span>
-                <span>of {stats?.totalBuilds || 0} total</span>
+              {/* Reverted Legend Text */}
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>{currentBuildStats.passed} passed</span>
+                <span>of {currentBuildStats.total} total</span>
               </div>
             </div>
           }
@@ -147,23 +177,24 @@ export function Dashboard() {
             Current Build Status: <span>{buildNumber || '-'}</span>
           </h3>
           <div className="grid grid-cols-3 gap-3">
+            {/* Use currentBuildStats calculated directly */}
             <div className="flex flex-col items-center bg-green-50 py-2 px-3 rounded-lg">
               <span className="font-semibold text-lg text-status-passed">
-                {stats?.status.passed || 0}
+                {currentBuildStats.passed}
               </span>
               <span className="text-xs text-gray-500">Passed</span>
             </div>
-            
+
             <div className="flex flex-col items-center bg-red-50 py-2 px-3 rounded-lg">
               <span className="font-semibold text-lg text-status-failed">
-                {stats?.status.failed || 0}
+                {currentBuildStats.failed}
               </span>
               <span className="text-xs text-gray-500">Failed</span>
             </div>
-            
+
             <div className="flex flex-col items-center bg-blue-50 py-2 px-3 rounded-lg">
               <span className="font-semibold text-lg text-status-inprogress">
-                {stats?.status.inprogress || 0}
+                {currentBuildStats.inprogress + currentBuildStats.pending} {/* Combine inprogress and pending for Running */}
               </span>
               <span className="text-xs text-gray-500">Running</span>
             </div>
@@ -182,7 +213,8 @@ export function Dashboard() {
         isOpen={isSheetOpen}
         onClose={closeSheet}
         build={buildDetails}
-        pipelineStats={stats?.status}
+        // Pass the correctly calculated counts for the selected build
+        pipelineStats={currentBuildStats}
       />
     </div>
   );

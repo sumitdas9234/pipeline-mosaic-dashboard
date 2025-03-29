@@ -1,390 +1,319 @@
-import { Product, Pipeline, PipelineStats, Build } from '@/types';
+import { Product, Pipeline, PipelineStats, Build, Status, Testcase } from '@/types'; // Added Testcase import
+import { faker } from '@faker-js/faker'; // Using faker for more realistic data
 
-// Add type definition for Status if not already defined
-type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
+// --- Constants ---
+const PRODUCT_ID = 'product-a';
+const PRODUCT_NAME = 'Product A';
+const RELEASES = [
+  { id: 'release-1.1.0', name: '1.1.0' },
+  { id: 'release-1.2.0', name: '1.2.0' },
+];
+const BUILDS_PER_RELEASE = 15;
+const PIPELINES_PER_BUILD = 15;
+// Define all possible statuses for history generation first
+const ALL_POSSIBLE_STATUSES: Status[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
+// Define allowed statuses for *new* pipelines
+const ALLOWED_PIPELINE_STATUSES: Status[] = ['passed', 'failed', 'inprogress'];
+const BUILD_ID_MIN = 1675;
+const BUILD_ID_MAX = 1960;
+const TESTSET_ID_MIN = 156785;
+const TESTSET_ID_MAX = 176543;
 
-// Helper function to generate random status history
-const generateRandomHistory = (baseStatus: 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress', length = 20) => {
-  const statuses: ('passed' | 'failed' | 'aborted' | 'pending' | 'inprogress')[] = ['passed', 'failed', 'aborted', 'pending', 'inprogress'];
-  const history = [];
-  
-  // Make the history somewhat biased towards the current status
-  const bias = 0.5; // 50% chance to be the base status
-  
-  for (let i = 0; i < length; i++) {
-    if (Math.random() < bias) {
-      history.push(baseStatus);
+
+// --- Helper Functions ---
+
+// Generate random status history
+const generateRandomHistory = (baseStatus: Status, length = 20): Status[] => {
+  const history: Status[] = [];
+  // Define statuses valid for historical runs (excluding inprogress/pending)
+  const historicalStatuses: Status[] = ['passed', 'failed', 'aborted'];
+  const bias = 0.6; // 60% chance to be the base status (for historical part)
+
+  // Generate the historical part (length - 1 elements)
+  for (let i = 0; i < length - 1; i++) {
+    // Bias towards the *current* status for some consistency, but pick only from historical ones
+    if (Math.random() < bias && historicalStatuses.includes(baseStatus)) {
+       history.push(baseStatus);
     } else {
-      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-      history.push(randomStatus);
+      // Pick a random valid historical status
+      history.push(faker.helpers.arrayElement(historicalStatuses));
     }
   }
-  
+
+  // Ensure the last element matches the current pipeline status
+  history.push(baseStatus);
+
   return history;
 };
 
-export const products: Product[] = [
-  {
-    id: 'product-a',
-    name: 'Product A',
-    releases: [
-      {
-        id: 'release-1.1.0',
-        name: '1.1.0',
-        builds: [
-          { 
-            id: 'build-1000', 
-            buildNumber: '1000', 
-            date: '2023-06-10',
-            status: 'passed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1000'
-          },
-          { 
-            id: 'build-1001', 
-            buildNumber: '1001', 
-            date: '2023-06-11',
-            status: 'passed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1001'
-          },
-          { 
-            id: 'build-1006', 
-            buildNumber: '1006', 
-            date: '2023-06-12',
-            status: 'inprogress',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1006'
-          },
-        ]
-      },
-      {
-        id: 'release-1.2.0',
-        name: '1.2.0',
-        builds: [
-          { 
-            id: 'build-1234', 
-            buildNumber: '1234', 
-            date: '2023-06-15',
-            status: 'failed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1234'
-          },
-          { 
-            id: 'build-1235', 
-            buildNumber: '1235', 
-            date: '2023-06-16',
-            status: 'passed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-a/job/build-1235'
-          },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'product-b',
-    name: 'Product B',
-    releases: [
-      {
-        id: 'release-2.2.1',
-        name: '2.2.1',
-        builds: [
-          { 
-            id: 'build-1002', 
-            buildNumber: '1002', 
-            date: '2023-06-10',
-            status: 'failed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1002'
-          },
-          { 
-            id: 'build-1003', 
-            buildNumber: '1003', 
-            date: '2023-06-11',
-            status: 'failed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1003'
-          },
-        ]
-      },
-      {
-        id: 'release-2.3.0',
-        name: '2.3.0',
-        builds: [
-          { 
-            id: 'build-1007', 
-            buildNumber: '1007', 
-            date: '2023-06-13',
-            status: 'passed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1007'
-          },
-        ]
-      },
-      {
-        id: 'release-2.3.0.1',
-        name: '2.3.0.1',
-        builds: [
-          { 
-            id: 'build-1008', 
-            buildNumber: '1008', 
-            date: '2023-06-14',
-            status: 'passed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-b/job/build-1008'
-          },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'product-c',
-    name: 'Product C',
-    releases: [
-      {
-        id: 'release-3.2.0',
-        name: '3.2.0',
-        builds: [
-          { 
-            id: 'build-1004', 
-            buildNumber: '1004', 
-            date: '2023-06-10',
-            status: 'inprogress',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1004'
-          },
-          { 
-            id: 'build-1005', 
-            buildNumber: '1005', 
-            date: '2023-06-11',
-            status: 'failed',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1005'
-          },
-          { 
-            id: 'build-1008', 
-            buildNumber: '1008', 
-            date: '2023-06-12',
-            status: 'inprogress',
-            commitDetails: [],
-            artifacts: [],
-            jenkinsUrl: 'https://jenkins.example.com/job/product-c/job/build-1008'
-          },
-        ]
-      }
-    ]
-  }
-];
+// Generate random commit details
+const generateCommitDetails = () => ({
+  commitId: faker.git.commitSha(),
+  repositoryUrl: faker.internet.url({ appendSlash: false, protocol: 'https' }) + '/' + faker.lorem.slug(),
+  branch: faker.git.branch(),
+  author: `${faker.person.fullName()} <${faker.internet.email()}>`,
+});
 
-// Helper function to generate pipelines for a build
-const generateBuildPipelines = (buildId: string, productId: string, releaseId: string): Pipeline[] => {
-  const pipelineNames = [
-    'API Integration Test',
-    'UI Test Suite',
-    'Performance Test',
-    'Security Scan',
-    'Database Migration Test',
-    'Load Test',
-    'Smoke Test',
-    'End-to-End Test',
-    'Unit Test Suite',
-    'Regression Test'
-  ];
-
-  return pipelineNames.map((name, index) => {
-    // Ensure at least 5 pipelines are failed and properly type the status
-    const status: Status = index < 5 ? 'failed' : (['passed', 'inprogress'] as const)[Math.floor(Math.random() * 2)];
-    
-    // Generate a random 5-digit number for testsetId
-    const testsetId = Math.floor(10000 + Math.random() * 90000).toString();
-    
-    return {
-      id: `pipeline-${buildId}-${index + 1}`,
-      name,
-      status,
-      testsetId,
-      date: new Date().toISOString().split('T')[0],
-      duration: `${Math.floor(Math.random() * 10) + 1}m ${Math.floor(Math.random() * 60)}s`,
-      tests: { 
-        passed: Math.floor(Math.random() * 10),
-        total: 10
-      },
-      owner: 'system',
-      productId,
-      releaseId,
-      buildId,
-      platformIssues: Math.floor(Math.random() * 5),
-      history: generateRandomHistory(status as 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress')
-    };
-  });
+// Generate random artifact details
+const generateArtifactDetails = (productName: string, buildNumber: string) => {
+  const name = faker.helpers.arrayElement(['api-service', 'web-frontend', 'data-processor', 'auth-service', 'notification-service']);
+  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
+  return {
+    name,
+    imageUrl: `container-registry.com/${sanitizedProductName}/${name}:${buildNumber}-${faker.git.commitSha({ length: 8 })}`,
+    shaDigest: `sha256:${faker.string.hexadecimal({ length: 64, prefix: '', casing: 'lower' })}`,
+  };
 };
 
-// Update the pipelines array
+// Generate enhanced build data (commit details, artifacts)
+const generateEnhancedBuildData = (productName: string, buildNumber: string) => {
+  const baseUrl = 'https://jenkins.example.com';
+  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
+  const commitCount = faker.number.int({ min: 1, max: 3 });
+  const artifactCount = faker.number.int({ min: 1, max: 3 });
+
+  return {
+    commitDetails: Array.from({ length: commitCount }, generateCommitDetails),
+    artifacts: Array.from({ length: artifactCount }, () => generateArtifactDetails(productName, buildNumber)),
+    jenkinsUrl: `${baseUrl}/job/${sanitizedProductName}/job/build-${buildNumber}`,
+  };
+};
+
+// Generate a specified number of unique builds within the defined range for a release
+const generateBuilds = (releaseId: string, count: number): Build[] => {
+  const builds: Build[] = [];
+  const generatedNumbers = new Set<number>();
+
+  // Ensure we don't request more unique builds than available in the range
+  const maxPossibleBuilds = BUILD_ID_MAX - BUILD_ID_MIN + 1;
+  const buildsToGenerate = Math.min(count, maxPossibleBuilds);
+
+  while (generatedNumbers.size < buildsToGenerate) {
+    generatedNumbers.add(faker.number.int({ min: BUILD_ID_MIN, max: BUILD_ID_MAX }));
+  }
+
+  generatedNumbers.forEach(buildNum => {
+    const buildNumberStr = buildNum.toString();
+    const buildId = `build-${buildNumberStr}`;
+    // Build status can still be passed/failed/inprogress
+    const status = faker.helpers.arrayElement(['passed', 'failed', 'inprogress'] as const);
+    const enhancedData = generateEnhancedBuildData(PRODUCT_NAME, buildNumberStr);
+    // Correctly structure the pushed object
+    builds.push({
+      id: buildId,
+      buildNumber: buildNumberStr,
+      date: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
+      status: status,
+      ...enhancedData,
+    });
+  }); // Close forEach loop correctly
+  return builds;
+};
+
+// Generate pipelines for a specific build
+const generateBuildPipelines = (buildId: string, productId: string, releaseId: string, count: number): Pipeline[] => {
+  const pipelines: Pipeline[] = [];
+  for (let i = 0; i < count; i++) {
+    const pipelineIndex = i + 1;
+    // Use only allowed statuses
+    const status = faker.helpers.arrayElement(ALLOWED_PIPELINE_STATUSES);
+    const testsPassed = faker.number.int({ min: 0, max: 100 });
+    const testsTotal = testsPassed + faker.number.int({ min: 0, max: 20 }); // Total is always >= passed
+
+    pipelines.push({
+      id: `pipeline-${buildId}-${pipelineIndex}`,
+      name: `pipeline-${pipelineIndex}`,
+      status: status, // Assign restricted status
+      // Generate Testset ID within the specified range
+      testsetId: faker.number.int({ min: TESTSET_ID_MIN, max: TESTSET_ID_MAX }).toString(),
+      date: faker.date.recent({ days: 1 }).toISOString().split('T')[0], // Pipelines run recently
+      duration: `${faker.number.int({ min: 0, max: 59 })}m ${faker.number.int({ min: 0, max: 59 })}s`,
+      tests: {
+        passed: testsPassed,
+        total: testsTotal,
+      },
+      owner: faker.helpers.arrayElement(['system', 'dev-team', 'qa-team']),
+      productId: productId,
+      releaseId: releaseId,
+      buildId: buildId,
+      platformIssues: status === 'failed' ? faker.number.int({ min: 0, max: 5 }) : 0, // Issues more likely on failure
+      history: generateRandomHistory(status),
+      // Add optional fields from Pipeline type
+      suiteId: `suite-${faker.string.alphanumeric(5)}`,
+      branch: faker.git.branch(),
+      description: faker.lorem.sentence(),
+      lastSuccess: status === 'passed' ? faker.date.recent({ days: 7 }).toISOString() : undefined,
+      startTime: faker.date.recent({ days: 1 }).toISOString(),
+      // Ensure endTime is after startTime for completed statuses
+      endTime: status !== 'inprogress' && status !== 'pending'
+        ? faker.date.soon({ days: 1, refDate: pipelines[pipelines.length - 1]?.startTime ?? new Date() }).toISOString()
+        : undefined,
+    });
+  }
+  return pipelines;
+};
+
+// --- Generate Mock Data ---
+
+// Generate builds for each release using the new random range logic
+const generatedBuilds: { [releaseId: string]: Build[] } = {};
+RELEASES.forEach(release => {
+  generatedBuilds[release.id] = generateBuilds(release.id, BUILDS_PER_RELEASE);
+});
+
+// Define the single product with its releases and generated builds
+export const products: Product[] = [
+  {
+    id: PRODUCT_ID,
+    name: PRODUCT_NAME,
+    releases: RELEASES.map(release => ({
+      id: release.id,
+      name: release.name,
+      builds: generatedBuilds[release.id],
+    })),
+  },
+];
+
+// Generate pipelines for all builds across all releases
 export const pipelines: Pipeline[] = products.flatMap(product =>
   product.releases.flatMap(release =>
     release.builds.flatMap(build =>
-      generateBuildPipelines(build.id, product.id, release.id)
+      generateBuildPipelines(build.id, product.id, release.id, PIPELINES_PER_BUILD)
     )
   )
 );
 
+// --- Generate Mock Testcases ---
+
+// Modify function to accept pipeline status
+const generateTestcasesForTestset = (testsetId: string, pipelineStatus: Status): Testcase[] => {
+  const testcaseCount = faker.number.int({ min: 5, max: 25 });
+  const testcases: Testcase[] = [];
+  // Define allowed statuses for non-passed/non-failed pipelines
+  const randomTestcaseStatuses: Status[] = ['passed', 'failed', 'inprogress', 'pending'];
+  let hasFailed = false; // Track if a failed testcase was added for a failed pipeline
+
+  for (let i = 0; i < testcaseCount; i++) {
+    const testcaseId = `tc-${testsetId}-${i + 1}`;
+    let status: Status;
+
+    if (pipelineStatus === 'passed') {
+      status = 'passed'; // Force passed if pipeline passed
+    } else if (pipelineStatus === 'failed') {
+      // Ensure at least one test fails if the pipeline failed
+      if (i === testcaseCount - 1 && !hasFailed) { // If last testcase and none failed yet
+        status = 'failed';
+      } else {
+        status = faker.helpers.arrayElement(randomTestcaseStatuses);
+        if (status === 'failed') hasFailed = true;
+      }
+    } else {
+      // For 'inprogress' pipelines, allow random statuses
+      status = faker.helpers.arrayElement(randomTestcaseStatuses);
+    }
+
+    testcases.push({
+      testcaseId: testcaseId,
+      testsetId: testsetId,
+      name: `Test Case ${faker.lorem.words(3)}`,
+      status: status,
+      duration: `${faker.number.int({ min: 0, max: 5 })}m ${faker.number.int({ min: 0, max: 59 })}s`,
+      logs: faker.internet.url() + '/logs',
+      step: i + 1,
+      testRunUrl: faker.internet.url() + '/testrun/' + testcaseId,
+      description: faker.lorem.sentence(),
+      history: generateRandomHistory(status), // Generate history based on current status
+    });
+  }
+  return testcases;
+};
+
+// Generate testcases for every pipeline/testset, passing the pipeline status
+export const mockTestcases: Testcase[] = pipelines.flatMap(pipeline =>
+  generateTestcasesForTestset(pipeline.testsetId, pipeline.status)
+);
+
+// --- Update Pipeline Test Counts Based on Generated Testcases ---
+// This loop now correctly reflects the potentially forced testcase statuses
+pipelines.forEach(pipeline => {
+  const associatedTestcases = mockTestcases.filter(tc => tc.testsetId === pipeline.testsetId);
+  const passedCount = associatedTestcases.filter(tc => tc.status === 'passed').length;
+  pipeline.tests = {
+    passed: passedCount,
+    total: associatedTestcases.length,
+  };
+});
+// --- End Update ---
+
+
+// --- Data Calculation & Fetching ---
+
 export const calculatePipelineStats = (filteredPipelines: Pipeline[]): PipelineStats => {
-  // Get unique builds
-  const uniqueBuilds = new Set(filteredPipelines.map(p => p.buildId));
-  
-  // Calculate success rate using total pipelines (should be 10)
-  const totalPipelines = 10; // Fixed number of pipelines per build
-  const passedPipelines = filteredPipelines.filter(p => p.status === 'passed').length;
-  const successRate = Math.round((passedPipelines / totalPipelines) * 100);
-  
-  // Get latest build date (assuming we want the most recent)
-  let latestBuild = '';
+  if (filteredPipelines.length === 0) {
+    return {
+      totalBuilds: 0,
+      successRate: 0,
+      latestBuild: 'N/A',
+      platformIssues: 0,
+      status: { passed: 0, failed: 0, aborted: 0, pending: 0, inprogress: 0 },
+    };
+  }
+
+  const buildIds = new Set(filteredPipelines.map(p => p.buildId));
+
+  // Calculate counts based *only* on the pipelines passed into this function
+  // Use ALL_POSSIBLE_STATUSES for calculating the full status breakdown
+  const statusCounts = ALL_POSSIBLE_STATUSES.reduce((acc, status) => {
+    acc[status] = filteredPipelines.filter(p => p.status === status).length;
+    return acc;
+  }, {} as Record<Status, number>);
+
+
+  // Calculate total relevant pipelines (passed, failed, inprogress) from the counts
+  const relevantTotalPipelines = statusCounts.passed + statusCounts.failed + statusCounts.inprogress;
+
+  // Calculate success rate based on relevant total
+  const successRate = relevantTotalPipelines > 0 ? Math.round((statusCounts.passed / relevantTotalPipelines) * 100) : 0;
+
+  // Find the latest build *represented in the filtered data*
+  let latestBuildId = 'N/A';
   if (filteredPipelines.length > 0) {
-    const sortedPipelines = [...filteredPipelines].sort((a, b) => 
+    // Find the build associated with the most recent pipeline date
+    const sortedPipelines = [...filteredPipelines].sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-    latestBuild = sortedPipelines[0].buildId;
+    latestBuildId = sortedPipelines[0].buildId;
   }
-  
-  // Calculate total platform issues
-  const platformIssues = filteredPipelines.reduce((total, pipeline) => 
+
+  const platformIssues = filteredPipelines.reduce((total, pipeline) =>
     total + (pipeline.platformIssues || 0), 0);
 
-  // Count status
-  const statusCounts = {
-    passed: filteredPipelines.filter(p => p.status === 'passed').length,
-    failed: Math.max(5, filteredPipelines.filter(p => p.status === 'failed').length),
-    inprogress: filteredPipelines.filter(p => p.status === 'inprogress' || p.status === 'pending').length,
-  };
-  
+  // Removed duplicated statusCounts calculation
+
   return {
-    totalBuilds: totalPipelines, // Changed from uniqueBuilds.size to totalPipelines
+    totalBuilds: buildIds.size, // Count unique builds represented
     successRate,
-    latestBuild,
+    latestBuild: latestBuildId, // Show the ID of the latest build in the filtered set
     platformIssues,
-    status: statusCounts
+    status: statusCounts, // Use the correctly calculated statusCounts
+    relevantTotalPipelines: relevantTotalPipelines, // Include the relevant total
   };
 };
 
-// Helper function to generate a random commit ID
-const generateCommitId = () => {
-  const chars = 'abcdef0123456789';
-  let result = '';
-  for (let i = 0; i < 40; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-};
 
-// Helper function to generate a random SHA digest
-const generateShaDigest = () => {
-  const chars = 'abcdef0123456789';
-  let result = 'sha256:';
-  for (let i = 0; i < 64; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-};
+// --- Mock API Functions ---
 
-// Helper to generate random repository details
-const getRepositoryDetails = (productName: string) => {
-  const repos = [
-    'github.com/myorg/frontend-web',
-    'github.com/myorg/backend-api',
-    'github.com/myorg/data-service',
-    'github.com/myorg/auth-service',
-    'github.com/myorg/notification-service'
-  ];
-  
-  const branches = [
-    'main',
-    'develop',
-    'feature/auth-improvements',
-    'hotfix/security-patch',
-    'release/v2.0'
-  ];
-  
-  const authors = [
-    'John Doe <john.doe@example.com>',
-    'Jane Smith <jane.smith@example.com>',
-    'Mike Johnson <mike.johnson@example.com>',
-    'Sarah Williams <sarah.williams@example.com>',
-    'Alex Brown <alex.brown@example.com>'
-  ];
-  
-  return {
-    commitId: generateCommitId(),
-    repositoryUrl: `https://${repos[Math.floor(Math.random() * repos.length)]}`,
-    branch: branches[Math.floor(Math.random() * branches.length)],
-    author: authors[Math.floor(Math.random() * authors.length)]
-  };
-};
-
-// Helper to generate random artifact details
-const getArtifactDetails = (productName: string, buildNumber: string) => {
-  const artifactNames = [
-    'api-service',
-    'web-frontend',
-    'data-processor',
-    'auth-service',
-    'notification-service'
-  ];
-  
-  const name = artifactNames[Math.floor(Math.random() * artifactNames.length)];
-  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
-  const commitId = generateCommitId().substring(0, 8);
-  
-  return {
-    name,
-    imageUrl: `container-registry.com/${sanitizedProductName}/${name}:${buildNumber}-${commitId}`,
-    shaDigest: generateShaDigest()
-  };
-};
-
-// Helper to generate enhanced build data
-const generateEnhancedBuildData = (productName: string, buildNumber: string, status: 'passed' | 'failed' | 'inprogress') => {
-  const baseUrl = 'https://jenkins.example.com';
-  const sanitizedProductName = productName.toLowerCase().replace(/\s+/g, '-');
-  
-  // Generate 1-3 commit details
-  const commitCount = Math.floor(Math.random() * 3) + 1;
-  const commitDetails = [];
-  for (let i = 0; i < commitCount; i++) {
-    commitDetails.push(getRepositoryDetails(productName));
-  }
-  
-  // Generate 1-3 artifacts
-  const artifactCount = Math.floor(Math.random() * 3) + 1;
-  const artifacts = [];
-  for (let i = 0; i < artifactCount; i++) {
-    artifacts.push(getArtifactDetails(productName, buildNumber));
-  }
-  
-  return {
-    commitDetails,
-    artifacts,
-    jenkinsUrl: `${baseUrl}/job/${sanitizedProductName}/job/build-${buildNumber}`
-  };
+// Function to fetch testcases for a specific testset ID
+export const fetchTestcases = async (testsetId: string): Promise<Testcase[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 109876, max: 139876 })));
+  return mockTestcases.filter(tc => tc.testsetId === testsetId);
 };
 
 export const fetchProducts = async (): Promise<Product[]> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(products);
-    }, 300);
-  });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 100, max: 400 })));
+  return products;
 };
 
 export const fetchPipelines = async (
@@ -392,25 +321,24 @@ export const fetchPipelines = async (
   releaseId: string | null = null,
   buildId: string | null = null
 ): Promise<Pipeline[]> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      let result = [...pipelines];
-      
-      if (productId) {
-        result = result.filter(pipeline => pipeline.productId === productId);
-      }
-      
-      if (releaseId) {
-        result = result.filter(pipeline => pipeline.releaseId === releaseId);
-      }
-      
-      if (buildId) {
-        result = result.filter(pipeline => pipeline.buildId === buildId);
-      }
-      
-      resolve(result);
-    }, 500);
-  });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 200, max: 600 })));
+
+  let result = [...pipelines];
+
+  if (productId) {
+    result = result.filter(pipeline => pipeline.productId === productId);
+  }
+
+  if (releaseId) {
+    result = result.filter(pipeline => pipeline.releaseId === releaseId);
+  }
+
+  if (buildId) {
+    result = result.filter(pipeline => pipeline.buildId === buildId);
+  }
+
+  return result;
 };
 
 export const fetchPipelineStats = async (
@@ -418,38 +346,29 @@ export const fetchPipelineStats = async (
   releaseId: string | null = null,
   buildId: string | null = null
 ): Promise<PipelineStats> => {
-  return new Promise(resolve => {
-    setTimeout(async () => {
-      const filteredPipelines = await fetchPipelines(productId, releaseId, buildId);
-      resolve(calculatePipelineStats(filteredPipelines));
-    }, 300);
-  });
+   // Simulate API delay
+   await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 150, max: 450 })));
+   const filteredPipelines = await fetchPipelines(productId, releaseId, buildId);
+   return calculatePipelineStats(filteredPipelines);
 };
 
 export const fetchBuildDetails = async (buildId: string): Promise<Build | null> => {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 250, max: 550 })));
+
   try {
-    // Find the product that contains this build
+    // Find the build within the generated products data
     for (const product of products) {
       for (const release of product.releases) {
         const build = release.builds.find(b => b.id === buildId);
         if (build) {
-          const enhancedData = generateEnhancedBuildData(
-            product.name,
-            build.buildNumber,
-            build.status
-          );
-          
-          return {
-            ...build,
-            ...enhancedData
-          };
+          // Return the found build data (already contains enhanced details)
+          return build;
         }
       }
     }
-    return null;
+    console.warn(`Build details not found for buildId: ${buildId}`);
+    return null; // Build not found
   } catch (error) {
     console.error('Error fetching build details:', error);
     return null;

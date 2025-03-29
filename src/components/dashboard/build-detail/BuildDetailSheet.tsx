@@ -20,10 +20,14 @@ interface BuildDetailSheetProps {
   isOpen: boolean;
   onClose: () => void;
   build: Build | null;
+  // Update prop type to match the full stats object being passed
   pipelineStats: {
     passed: number;
     failed: number;
     inprogress: number;
+    aborted: number;
+    pending: number;
+    total: number;
   } | null;
 }
 
@@ -69,7 +73,8 @@ export function BuildDetailSheet({ isOpen, onClose, build, pipelineStats }: Buil
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[95%] sm:w-[750px] lg:w-[60%] xl:w-[50%] overflow-y-auto font-sans">
+      {/* Set width to 40% of viewport width */}
+      <SheetContent className="w-[30vw] overflow-y-auto font-sans">
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center space-x-2">
             <span>Build {build.buildNumber}</span>

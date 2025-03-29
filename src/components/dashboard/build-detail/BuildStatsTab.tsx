@@ -7,21 +7,30 @@ import { Build } from '@/types';
 
 interface BuildStatsTabProps {
   build: Build;
+  // Update prop type to expect the full stats object
   pipelineStats: {
     passed: number;
     failed: number;
     inprogress: number;
+    aborted: number;
+    pending: number;
+    total: number;
   } | null;
 }
 
 export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
   if (!pipelineStats) return null;
 
+  // Combine inprogress and pending for the chart display
+  const inProgressCount = pipelineStats.inprogress + pipelineStats.pending;
+
   const chartData = [
     { name: 'Passed', value: pipelineStats.passed, color: '#10B981' }, // Green for pass
     { name: 'Failed', value: pipelineStats.failed, color: '#EF4444' }, // Red for fail
-    { name: 'In Progress', value: pipelineStats.inprogress, color: '#F97316' } // Amber for in progress
-  ].filter(item => item.value > 0);
+    { name: 'In Progress', value: inProgressCount, color: '#F97316' } // Amber for in progress + pending
+    // We can optionally add Aborted if needed, e.g.:
+    // { name: 'Aborted', value: pipelineStats.aborted, color: '#6B7280' } // Gray for aborted
+  ].filter(item => item.value > 0); // Filter out slices with zero value
 
   const chartConfig = {
     passed: { 
@@ -32,10 +41,15 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
       color: '#EF4444',
       label: 'Failed'
     },
-    inprogress: { 
+    inprogress: {
       color: '#F97316',
       label: 'In Progress'
-    }
+    },
+    // Add aborted to config if you include it in chartData
+    // aborted: {
+    //   color: '#6B7280',
+    //   label: 'Aborted'
+    // }
   };
 
   const RADIAN = Math.PI / 180;
@@ -102,16 +116,22 @@ export function BuildStatsTab({ build, pipelineStats }: BuildStatsTabProps) {
               </RechartsPieChart>
             </ChartContainer>
           </div>
-          
-          <div className="flex justify-center items-center gap-6">
-            {chartData.map(item => (
-              <div key={item.name} className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded-full" style={{ backgroundColor: item.color }}></div>
-                <span className="text-sm whitespace-nowrap">
-                  {item.name}: {item.value}
-                </span>
-              </div>
-            ))}
+
+          {/* Update Legend to use correct counts */}
+          <div className="flex justify-center items-center gap-6 flex-wrap">
+            {chartData.map(item => {
+              // Get label from chartConfig, fallback to item.name
+              const configKey = item.name.toLowerCase().replace(' ', ''); // Match config keys (e.g., 'inprogress')
+              const label = chartConfig[configKey as keyof typeof chartConfig]?.label || item.name;
+              return (
+                <div key={item.name} className="flex items-center gap-2">
+                  <div className="h-4 w-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                  <span className="text-sm whitespace-nowrap">
+                    {label}: {item.value}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

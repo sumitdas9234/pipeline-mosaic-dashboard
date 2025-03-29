@@ -11,44 +11,48 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TestItem, Status } from '@/types'; // Added Status type
-import { ExternalLink, ChevronDown, ChevronRight, Search } from 'lucide-react'; // Added Search Icon
+// Import Testcase instead of TestItem
+import { Testcase, Status } from '@/types';
+import { ExternalLink, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PipelineTestCasesTableProps {
-  testItems: TestItem[];
+  // Update prop name and type
+  testcases: Testcase[];
 }
 
 const ALL_STATUSES = 'all'; // Constant for "All Statuses" option
 
-export const PipelineTestCasesTable: React.FC<PipelineTestCasesTableProps> = ({ testItems }) => {
+// Update component props
+export const PipelineTestCasesTable: React.FC<PipelineTestCasesTableProps> = ({ testcases }) => {
   const [openAccordion, setOpenAccordion] = React.useState<string | null>(null);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<Status | typeof ALL_STATUSES>(ALL_STATUSES);
 
-  const toggleAccordion = (id: string) => {
-    // Use DOM manipulation to click the hidden trigger
-    document.getElementById(`accordion-trigger-${id}`)?.click();
-    // Update state if you manage it here
-    setOpenAccordion(openAccordion === id ? null : id);
+  // Update toggle function to use testcaseId
+  const toggleAccordion = (testcaseId: string) => {
+    document.getElementById(`accordion-trigger-${testcaseId}`)?.click();
+    setOpenAccordion(openAccordion === testcaseId ? null : testcaseId);
   };
 
-  // Filtered test items based on search and status
-  const filteredTestItems = React.useMemo(() => {
-    return testItems.filter(item => {
+  // Filtered testcases based on search and status
+  const filteredTestcases = React.useMemo(() => {
+    // Use testcases prop
+    return testcases.filter(testcase => {
       const searchMatch = searchTerm === '' ||
-                          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
-      const statusMatch = statusFilter === ALL_STATUSES || item.status === statusFilter;
+                          testcase.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (testcase.description && testcase.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      const statusMatch = statusFilter === ALL_STATUSES || testcase.status === statusFilter;
       return searchMatch && statusMatch;
     });
-  }, [testItems, searchTerm, statusFilter]);
+  }, [testcases, searchTerm, statusFilter]); // Update dependency
 
-  // Get unique statuses from the current items for the filter dropdown
+  // Get unique statuses from the current testcases for the filter dropdown
   const availableStatuses = React.useMemo(() => {
-    const statuses = new Set(testItems.map(item => item.status));
+    // Use testcases prop
+    const statuses = new Set(testcases.map(tc => tc.status));
     return [ALL_STATUSES, ...Array.from(statuses)] as (Status | typeof ALL_STATUSES)[];
-  }, [testItems]); // Add semicolon here
+  }, [testcases]); // Update dependency
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
@@ -97,41 +101,44 @@ export const PipelineTestCasesTable: React.FC<PipelineTestCasesTableProps> = ({ 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredTestItems.length > 0 ? (
-            filteredTestItems.map((test) => { // Start map callback with {
-              return ( // Explicit return
-                <React.Fragment key={test.id}>
+          {/* Use filteredTestcases */}
+          {filteredTestcases.length > 0 ? (
+            filteredTestcases.map((testcase) => { // Use testcase variable
+              return (
+                // Use testcase.testcaseId as key
+                <React.Fragment key={testcase.testcaseId}>
                   <TableRow
                     className="hover:bg-gray-50/80 cursor-pointer border-b border-gray-100 group"
-                    onClick={() => toggleAccordion(test.id)}
+                    // Use testcase.testcaseId in onClick
+                    onClick={() => toggleAccordion(testcase.testcaseId)}
                   >
                     <TableCell className="py-3 px-4 align-middle">
-                       {/* Chevron Indicator */}
-                       {openAccordion === test.id ? (
+                       {/* Chevron Indicator - use testcase.testcaseId */}
+                       {openAccordion === testcase.testcaseId ? (
                           <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
                        ) : (
                           <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
                        )}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm font-medium text-gray-800 align-middle">
-                      {test.name}
+                      {testcase.name}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-600 align-middle">{test.description || '-'}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm text-gray-600 align-middle">{testcase.description || '-'}</TableCell>
                     <TableCell className="py-3 px-4 align-middle">
                       <StatusHistory
-                        history={test.history || [test.status, test.status === 'passed' ? 'failed' : 'passed', test.status]}
+                        history={testcase.history || [testcase.status, testcase.status === 'passed' ? 'failed' : 'passed', testcase.status]}
                         className="min-w-32"
                       />
                     </TableCell>
                     <TableCell className="py-3 px-4 align-middle">
-                      {test.testRunUrl ? (
+                      {testcase.testRunUrl ? (
                         <Button
                           variant="link"
                           size="sm"
                           className="h-auto p-0 text-xs text-blue-600 hover:underline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(test.testRunUrl, '_blank');
+                            window.open(testcase.testRunUrl, '_blank');
                           }}
                         >
                           <ExternalLink className="h-3.5 w-3.5 mr-1 inline-block" />
@@ -139,21 +146,21 @@ export const PipelineTestCasesTable: React.FC<PipelineTestCasesTableProps> = ({ 
                         </Button>
                       ) : <span className="text-gray-400">-</span>}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-600 align-middle">{test.duration}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm text-gray-600 align-middle">{testcase.duration}</TableCell>
                     <TableCell className="py-3 px-4 align-middle">
-                      <StatusBadge status={test.status} size="sm" />
+                      <StatusBadge status={testcase.status} size="sm" />
                     </TableCell>
                   </TableRow>
-                  {/* Accordion Row for Logs */}
-                  <TableRow className={cn(openAccordion !== test.id && 'hidden')}>
+                  {/* Accordion Row for Logs - use testcase.testcaseId */}
+                  <TableRow className={cn(openAccordion !== testcase.testcaseId && 'hidden')}>
                     <TableCell colSpan={7} className="p-0 border-t border-gray-200">
                       <div className="px-6 py-4 bg-gray-950 text-gray-200 font-mono text-xs rounded-b-md overflow-x-auto whitespace-pre-wrap">
-                        {test.logs || 'No logs available.'}
+                        {testcase.logs || 'No logs available.'}
                       </div>
-                      {/* Keep hidden trigger */}
+                      {/* Keep hidden trigger - use testcase.testcaseId */}
                        <Accordion type="single" collapsible className="w-full hidden">
-                          <AccordionItem value={test.id} className="border-0">
-                            <AccordionTrigger id={`accordion-trigger-${test.id}`} />
+                          <AccordionItem value={testcase.testcaseId} className="border-0">
+                            <AccordionTrigger id={`accordion-trigger-${testcase.testcaseId}`} />
                             <AccordionContent></AccordionContent>
                           </AccordionItem>
                        </Accordion>

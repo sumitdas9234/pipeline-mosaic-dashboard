@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
-import { Button } from '@/components/ui/button'; // Keep Button for error state
-import { PipelineDetail } from '@/types';
-import { fetchPipelineDetail } from '@/data/mockPipelineDetails';
+import { Button } from '@/components/ui/button';
+// Import Pipeline and Testcase types separately
+import { Pipeline, Testcase } from '@/types';
+// Import the correct fetch functions from mockData
+import { fetchPipelines, fetchTestcases } from '@/data/mockData';
 import { ChevronLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { PipelineHeader } from '@/components/pipeline-detail/PipelineHeader';
@@ -13,24 +15,46 @@ import { PipelineLogLinks } from '@/components/pipeline-detail/PipelineLogLinks'
 import { PipelineTestCasesTable } from '@/components/pipeline-detail/PipelineTestCasesTable';
 
 const PipelineDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [pipeline, setPipeline] = useState<PipelineDetail | null>(null);
+  const { id: pipelineId } = useParams<{ id: string }>(); // Rename id to pipelineId for clarity
+  const [pipeline, setPipeline] = useState<Pipeline | null>(null); // State for pipeline data
+  const [testcases, setTestcases] = useState<Testcase[]>([]); // State for testcase data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadPipelineDetails = async () => {
-      if (!id) return;
-      
+    const loadData = async () => {
+      if (!pipelineId) {
+        setError('Pipeline ID is missing.');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      setPipeline(null); // Reset state
+      setTestcases([]);
+
       try {
-        setLoading(true);
-        const data = await fetchPipelineDetail(id);
-        setPipeline(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching pipeline details:', err);
-        setError('Failed to load pipeline details.');
+        // 1. Fetch the specific pipeline using its ID
+        // We need a way to fetch a single pipeline by ID. Let's assume fetchPipelines can handle this for now,
+        // or we might need to add a dedicated fetchPipelineById function later.
+        // For simplicity, let's filter the result of fetchPipelines.
+        const allPipelines = await fetchPipelines(); // Fetch all (inefficient for real API)
+        const foundPipeline = allPipelines.find(p => p.id === pipelineId);
+
+        if (!foundPipeline) {
+          throw new Error('Pipeline not found');
+        }
+        setPipeline(foundPipeline);
+
+        // 2. Fetch testcases using the testsetId from the found pipeline
+        const fetchedTestcases = await fetchTestcases(foundPipeline.testsetId);
+        setTestcases(fetchedTestcases);
+
+      } catch (err: any) {
+        console.error('Error loading pipeline details:', err);
+        setError(err.message || 'Failed to load pipeline details.');
         toast({
           title: "Error",
           description: "Failed to load pipeline details",
@@ -41,8 +65,8 @@ const PipelineDetailPage: React.FC = () => {
       }
     };
 
-    loadPipelineDetails();
-  }, [id, toast]);
+    loadData(); // Call the renamed function
+  }, [pipelineId, toast]); // Use the renamed route parameter in the dependency array
 
   if (loading) {
     return (
@@ -87,10 +111,13 @@ const PipelineDetailPage: React.FC = () => {
         </Link>
 
         {/* Use the new components */}
+        {/* Pass pipeline data to header */}
         <PipelineHeader pipeline={pipeline} />
         <PipelineActionsBar />
+        {/* Log links might need pipeline data too, adjust if necessary */}
         <PipelineLogLinks />
-        <PipelineTestCasesTable testItems={pipeline.testItems} />
+        {/* Pass fetched testcases to the table using the correct prop name */}
+        <PipelineTestCasesTable testcases={testcases} />
       </main>
     </div>
   );

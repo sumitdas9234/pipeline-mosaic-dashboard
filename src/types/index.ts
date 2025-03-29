@@ -62,8 +62,11 @@ export interface PipelineStats {
   status: {
     passed: number;
     failed: number;
+    aborted: number; // Add aborted count
+    pending: number; // Add pending count
     inprogress: number;
   };
+  relevantTotalPipelines?: number; // Add total relevant for success rate
 }
 
 export interface FilterOptions {
@@ -72,9 +75,10 @@ export interface FilterOptions {
   buildId: string | null;
 }
 
-// New interfaces for the pipeline details page
-export interface TestItem {
-  id: string;
+// Renamed from TestItem and added specific IDs
+export interface Testcase {
+  testcaseId: string; // Unique ID for the testcase
+  testsetId: string; // ID linking to the parent Pipeline/Testset
   name: string;
   status: Status;
   duration: string;
@@ -85,9 +89,10 @@ export interface TestItem {
   history?: Status[]; // Add history for test execution
 }
 
+// Update PipelineDetail to use Testcase type
 export interface PipelineDetail extends Pipeline {
   description?: string;
-  testItems: TestItem[];
+  // testItems: Testcase[]; // We might fetch this separately now
   environment?: string;
   trigger?: string;
   startTime?: string;
