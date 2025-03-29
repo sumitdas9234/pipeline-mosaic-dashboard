@@ -218,23 +218,6 @@ const PipelineDetailPage: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="border-t pt-4 pb-2 flex-col items-start gap-4">
-            {/* Progress bar section */}
-            <div className="w-full">
-              <div className="flex justify-between items-center mb-1.5">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Clock className="h-4 w-4 text-gray-400" />
-                  <span>Test Pass Rate:</span>
-                  <span className="font-medium">{passPercentage.toFixed(0)}%</span>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {passedTests} of {totalTests} tests passed
-                </div>
-              </div>
-              <Progress value={passPercentage} className="h-2 bg-gray-100">
-                <div className="h-full bg-status-passed" style={{ width: `${passPercentage}%` }} />
-              </Progress>
-            </div>
-            
             {/* Three column footer layout */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
               {/* Column 1: Timing */}
@@ -250,17 +233,18 @@ const PipelineDetailPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Column 2: Environment */}
-              <div className="flex gap-2 items-start">
-                <Server className="h-4 w-4 text-gray-400 mt-0.5" />
-                <div>
-                  <div className="text-sm font-medium">Environment</div>
-                  <div className="text-xs text-gray-500">
-                    Env: {pipeline.environment || 'N/A'}<br/>
-                    Trigger: {pipeline.trigger || 'N/A'}<br/>
-                    User: {pipeline.user || 'N/A'}
-                  </div>
+              {/* Column 2: Test Pass Rate */}
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <CheckIcon className="h-4 w-4 text-gray-400" />
+                  <span className="font-medium">Test Pass Rate: {passPercentage.toFixed(0)}%</span>
                 </div>
+                <div className="text-xs text-gray-500 mb-1">
+                  {passedTests} of {totalTests} tests passed
+                </div>
+                <Progress value={passPercentage} className="h-2 bg-gray-100">
+                  <div className="h-full bg-status-passed" style={{ width: `${passPercentage}%` }} />
+                </Progress>
               </div>
               
               {/* Column 3: Tags */}
@@ -336,22 +320,22 @@ const PipelineDetailPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="text-xs font-medium py-2 h-8">Testcase</TableHead>
-                <TableHead className="text-xs font-medium py-2 h-8">Description</TableHead>
-                <TableHead className="text-xs font-medium py-2 h-8">History</TableHead>
-                <TableHead className="w-20 text-xs font-medium py-2 h-8">Run URL</TableHead>
-                <TableHead className="w-24 text-xs font-medium py-2 h-8">Duration</TableHead>
-                <TableHead className="w-24 text-xs font-medium py-2 h-8">Status</TableHead>
+                <TableHead className="text-xs font-medium h-10">Testcase</TableHead>
+                <TableHead className="text-xs font-medium h-10">Description</TableHead>
+                <TableHead className="text-xs font-medium h-10">History</TableHead>
+                <TableHead className="w-20 text-xs font-medium h-10">Run URL</TableHead>
+                <TableHead className="w-24 text-xs font-medium h-10">Duration</TableHead>
+                <TableHead className="w-24 text-xs font-medium h-10">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pipeline.testItems.map((test) => (
                 <React.Fragment key={test.id}>
-                  <TableRow className="hover:bg-gray-50 cursor-pointer h-10" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
-                    <TableCell className="text-sm font-medium py-2">
+                  <TableRow className="hover:bg-gray-50 cursor-pointer" onClick={() => document.getElementById(`accordion-${test.id}`)?.click()}>
+                    <TableCell className="text-sm font-normal py-2">
                       {test.name}
                     </TableCell>
-                    <TableCell className="text-sm py-2">{test.description || '-'}</TableCell>
+                    <TableCell className="text-sm font-normal py-2">{test.description || '-'}</TableCell>
                     <TableCell className="py-2">
                       <StatusHistory 
                         history={test.history || [test.status, test.status === 'passed' ? 'failed' : 'passed', test.status]} 
