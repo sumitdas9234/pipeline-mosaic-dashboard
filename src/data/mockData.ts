@@ -1,4 +1,4 @@
-import { Product, Pipeline, PipelineStats, Build, Status, Testcase } from '@/types'; // Added Testcase import
+import { Product, Pipeline, PipelineStats, Build, Status, Testcase, FailureType } from '@/types'; // Added Testcase and FailureType import
 import { faker } from '@faker-js/faker'; // Using faker for more realistic data
 
 // --- Constants ---
@@ -119,6 +119,12 @@ const generateBuildPipelines = (buildId: string, productId: string, releaseId: s
     const status = faker.helpers.arrayElement(ALLOWED_PIPELINE_STATUSES);
     const testsPassed = faker.number.int({ min: 0, max: 100 });
     const testsTotal = testsPassed + faker.number.int({ min: 0, max: 20 }); // Total is always >= passed
+    let failureType: FailureType | undefined = undefined;
+
+    if (status === 'failed') {
+      // Assign a random failure type if the status is failed
+      failureType = faker.helpers.arrayElement(['Infra error', 'k8s install error', 'Product install error', 'Test error'] as FailureType[]);
+    }
 
     pipelines.push({
       id: `pipeline-${buildId}-${pipelineIndex}`,
@@ -148,6 +154,7 @@ const generateBuildPipelines = (buildId: string, productId: string, releaseId: s
       endTime: status !== 'inprogress' && status !== 'pending'
         ? faker.date.soon({ days: 1, refDate: pipelines[pipelines.length - 1]?.startTime ?? new Date() }).toISOString()
         : undefined,
+      failureType: failureType, // Add the generated failure type
     });
   }
   return pipelines;

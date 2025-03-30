@@ -1,4 +1,5 @@
 
+export type FailureType = 'Infra error' | 'k8s install error' | 'Product install error' | 'Test error';
 export type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
 
 export interface Pipeline {
@@ -21,6 +22,7 @@ export interface Pipeline {
   lastSuccess?: string; // Add last success information
   startTime?: string; // Add specific start time
   endTime?: string; // Add specific end time
+  failureType?: FailureType; // Add specific failure type for failed status
 }
 
 export interface Product {

@@ -79,6 +79,24 @@ export function Dashboard() {
 
   const currentBuildStats = calculateCurrentBuildStats();
 
+  // Calculate platform issues for the current build
+  const calculatePlatformIssues = () => {
+    let platformIssueCount = 0;
+    if (filters.buildId && pipelines) {
+      pipelines.forEach(p => {
+        if (p.status === 'failed' && 
+            (p.failureType === 'Infra error' || 
+             p.failureType === 'k8s install error' || 
+             p.failureType === 'Product install error')) {
+          platformIssueCount++;
+        }
+      });
+    }
+    return platformIssueCount;
+  };
+
+  const currentPlatformIssues = calculatePlatformIssues();
+
   // Calculate success rate based on the total pipelines for the current build
   const currentBuildSuccessRate = currentBuildStats.total > 0
     ? Math.round((currentBuildStats.passed / currentBuildStats.total) * 100)
@@ -109,14 +127,14 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <MetricCard
           title="Platform Issues"
-          value={stats?.platformIssues || 0}
+          value={currentPlatformIssues} // Use the newly calculated value
           icon="bug"
-          isLoading={loading.stats}
+          isLoading={loading.pipelines} // Use pipeline loading state as it depends on pipeline data
           customContent={
             <div className="mt-2 text-xs text-gray-500">
               <div className="flex items-center gap-1 mb-2">
                 <span className="bg-red-100 text-red-500 px-2 py-0.5 rounded text-xs">
-                  {stats?.platformIssues === 0 ? 'No issues' : `${stats?.platformIssues} issues found`}
+                  {currentPlatformIssues === 0 ? 'No platform issues' : `${currentPlatformIssues} platform issues found`}
                 </span>
               </div>
             </div>

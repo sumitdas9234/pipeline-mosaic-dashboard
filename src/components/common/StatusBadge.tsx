@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Status } from '@/types';
+import { Status, FailureType } from '@/types'; // Import FailureType
 import { CheckCircle, XCircle, Clock, AlertTriangle, PlayCircle } from 'lucide-react';
 
 interface StatusBadgeProps {
   status: Status;
+  failureType?: FailureType; // Add optional failureType prop
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showIcon?: boolean;
@@ -15,9 +16,11 @@ export function StatusBadge({
   status, 
   className, 
   size = 'md',
-  showIcon = true 
+  showIcon = true,
+  failureType // Destructure failureType here to use it
 }: StatusBadgeProps) {
-  const getStatusConfig = () => {
+  // Define getStatusConfig to accept failureType
+  const getStatusConfig = (currentFailureType?: FailureType) => { 
     switch (status) {
       case 'passed':
         return {
@@ -31,7 +34,8 @@ export function StatusBadge({
           bgColor: 'bg-red-100',
           textColor: 'text-status-failed',
           icon: <XCircle className="w-3.5 h-3.5" />,
-          label: 'Failed'
+          // Use the passed currentFailureType
+          label: currentFailureType ? currentFailureType : 'Failed' 
         };
       case 'aborted':
         return {
@@ -64,7 +68,8 @@ export function StatusBadge({
     }
   };
 
-  const { bgColor, textColor, icon, label } = getStatusConfig();
+  // Call getStatusConfig with the failureType prop
+  const { bgColor, textColor, icon, label } = getStatusConfig(failureType); 
   
   const sizeClasses = {
     sm: 'text-xs px-2 py-0.5',
