@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 // Import Pipeline and Testcase types separately
-import { Pipeline, Testcase } from '@/types';
+import { Pipeline, Testcase, TestItem } from '@/types';
 // Import the correct fetch functions from mockData
 import { fetchPipelines, fetchTestcases } from '@/data/mockData';
+// Import the specific fetchPipelineDetail function
+import { fetchPipelineDetail } from '@/data/mockPipelineDetails';
 import { ChevronLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { PipelineHeader } from '@/components/pipeline-detail/PipelineHeader';
@@ -36,20 +37,13 @@ const PipelineDetailPage: React.FC = () => {
       setTestcases([]);
 
       try {
-        // 1. Fetch the specific pipeline using its ID
-        // We need a way to fetch a single pipeline by ID. Let's assume fetchPipelines can handle this for now,
-        // or we might need to add a dedicated fetchPipelineById function later.
-        // For simplicity, let's filter the result of fetchPipelines.
-        const allPipelines = await fetchPipelines(); // Fetch all (inefficient for real API)
-        const foundPipeline = allPipelines.find(p => p.id === pipelineId);
-
-        if (!foundPipeline) {
-          throw new Error('Pipeline not found');
-        }
-        setPipeline(foundPipeline);
+        // Use fetchPipelineDetail instead of finding pipeline in the list
+        // This function will return a PipelineDetail object that includes testItems
+        const pipelineDetail = await fetchPipelineDetail(pipelineId);
+        setPipeline(pipelineDetail);
 
         // 2. Fetch testcases using the testsetId from the found pipeline
-        const fetchedTestcases = await fetchTestcases(foundPipeline.testsetId);
+        const fetchedTestcases = await fetchTestcases(pipelineDetail.testsetId);
         setTestcases(fetchedTestcases);
 
       } catch (err: any) {
