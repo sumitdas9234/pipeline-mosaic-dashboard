@@ -10,6 +10,7 @@ import {
   Play,
   Bug
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface MetricCardProps {
   title: string;
@@ -21,6 +22,7 @@ interface MetricCardProps {
   subtext?: string;
   customContent?: React.ReactNode;
   onClick?: () => void;
+  linkTo?: string; // Add link property
 }
 
 export function MetricCard({
@@ -32,8 +34,21 @@ export function MetricCard({
   isLoading = false,
   subtext,
   customContent,
-  onClick
+  onClick,
+  linkTo
 }: MetricCardProps) {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (linkTo) {
+      navigate(linkTo);
+    }
+  };
+  
+  const isClickable = Boolean(onClick || linkTo);
+
   const renderIcon = () => {
     const iconClass = cn(
       'w-5 h-5',
@@ -64,12 +79,12 @@ export function MetricCard({
     <div 
       className={cn(
         'glass-card p-5 rounded-xl transition-all duration-300 animate-fade-in',
-        onClick && 'hover:bg-gray-50',
+        isClickable && 'hover:bg-gray-50 cursor-pointer',
         className
       )}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
+      onClick={isClickable ? handleClick : undefined}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col w-full">
