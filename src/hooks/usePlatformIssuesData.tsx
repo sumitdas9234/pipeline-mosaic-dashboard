@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
-import { fetchPlatformIssues, fetchPlatformIssuesTrend, fetchPlatformMetrics } from '@/data/mockPlatformIssues';
+import { fetchPlatformIssues, fetchPlatformIssuesTrend, fetchPlatformMetrics, fetchInfraErrorsTrend } from '@/data/mockPlatformIssues';
 
 interface PlatformIssueFilters {
   timeRange: string;
@@ -20,6 +20,7 @@ interface PlatformMetrics {
 export function usePlatformIssuesData() {
   const [issues, setIssues] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [infraTrendData, setInfraTrendData] = useState<any[]>([]);
   const [metricData, setMetricData] = useState<PlatformMetrics | null>(null);
   const [filters, setFilters] = useState<PlatformIssueFilters>({
     timeRange: '30d',
@@ -43,6 +44,9 @@ export function usePlatformIssuesData() {
       const trendData = await fetchPlatformIssuesTrend(filters.timeRange);
       setTrendData(trendData);
       
+      const infraTrendData = await fetchInfraErrorsTrend(filters.timeRange);
+      setInfraTrendData(infraTrendData);
+      
       const metrics = await fetchPlatformMetrics(filters.timeRange);
       setMetricData(metrics);
     } catch (error) {
@@ -63,6 +67,7 @@ export function usePlatformIssuesData() {
   return {
     issues,
     trendData,
+    infraTrendData,
     metricData,
     filters,
     isLoading,

@@ -131,12 +131,15 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
       </Table>
       
       {/* Pagination with Rows per page selector */}
-      <div className="flex items-center justify-between py-4 px-2 border-t">
+      <div className="flex items-center justify-between py-4 px-6 border-t">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Rows per page:</span>
           <Select
             value={rowsPerPage.toString()}
-            onValueChange={(value) => setRowsPerPage(Number(value))}
+            onValueChange={(value) => {
+              setRowsPerPage(Number(value));
+              setCurrentPage(1); // Reset to first page when changing rows per page
+            }}
           >
             <SelectTrigger className="h-8 w-[70px] bg-gray-50 border-gray-100 text-xs">
               <SelectValue />
@@ -154,68 +157,70 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
           Showing {indexOfFirstIssue + 1} to {Math.min(indexOfLastIssue, issues.length)} of {issues.length} issues
         </div>
         
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} 
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-            
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              // Logic to show appropriate page numbers
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-                if (i === 4) return (
-                  <PaginationItem key="ellipsis-end">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-                if (i === 0) return (
-                  <PaginationItem key="ellipsis-start">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              } else {
-                if (i === 0) return (
-                  <PaginationItem key="ellipsis-start">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-                if (i === 4) return (
-                  <PaginationItem key="ellipsis-end">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-                pageNum = currentPage - 1 + i;
-              }
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} 
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
               
-              return (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink 
-                    onClick={() => handlePageChange(pageNum)}
-                    isActive={pageNum === currentPage}
-                  >
-                    {pageNum}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
-            
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                // Logic to show appropriate page numbers
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                  if (i === 4) return (
+                    <PaginationItem key="ellipsis-end">
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                  if (i === 0) return (
+                    <PaginationItem key="ellipsis-start">
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                } else {
+                  if (i === 0) return (
+                    <PaginationItem key="ellipsis-start">
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                  if (i === 4) return (
+                    <PaginationItem key="ellipsis-end">
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                  pageNum = currentPage - 1 + i;
+                }
+                
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink 
+                      onClick={() => handlePageChange(pageNum)}
+                      isActive={pageNum === currentPage}
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );

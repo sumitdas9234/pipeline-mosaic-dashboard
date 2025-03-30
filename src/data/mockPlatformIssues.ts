@@ -21,6 +21,11 @@ export interface TrendDataPoint {
   resolved: number;
 }
 
+export interface InfraErrorTrendPoint {
+  date: string;
+  count: number;
+}
+
 export interface PlatformMetrics {
   priorityCount: number;
   p0Count: number;
@@ -109,12 +114,51 @@ const generateTrendData = (days: number): TrendDataPoint[] => {
   return data;
 };
 
+// Generate infra errors trend data
+const generateInfraErrorsTrend = (days: number): InfraErrorTrendPoint[] => {
+  const data: InfraErrorTrendPoint[] = [];
+  const today = new Date();
+  
+  for (let i = days; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    
+    // Base values with some randomness
+    let baseValue = faker.number.int({ min: 0, max: 5 });
+    
+    // Create a spike effect for visualization purposes
+    if (i % 7 === 3) {
+      baseValue += faker.number.int({ min: 3, max: 8 });
+    }
+    
+    // Add some overall trend (slight decrease over time - showing improvement)
+    const trendFactor = Math.max(0.5, 1 - (i / days * 0.3)); // 30% decrease over the period
+    baseValue = Math.floor(baseValue * trendFactor);
+    
+    // Add some noise
+    const noise = faker.number.int({ min: -1, max: 1 });
+    const count = Math.max(0, baseValue + noise);
+    
+    data.push({
+      date: date.toISOString().split('T')[0],
+      count
+    });
+  }
+  
+  return data;
+};
+
 // Create mock data
 const MOCK_PLATFORM_ISSUES = generateMockIssues(50);
 const MOCK_TREND_DATA = {
   '7d': generateTrendData(7),
   '30d': generateTrendData(30),
   '90d': generateTrendData(90),
+};
+const MOCK_INFRA_ERRORS_TREND = {
+  '7d': generateInfraErrorsTrend(7),
+  '30d': generateInfraErrorsTrend(30),
+  '90d': generateInfraErrorsTrend(90),
 };
 
 // Mock API function to fetch platform issues
@@ -146,6 +190,19 @@ export const fetchPlatformIssuesTrend = async (timeRange: string): Promise<Trend
   
   // Default to 30 days
   return MOCK_TREND_DATA['30d'];
+};
+
+// Mock API function to fetch infra errors trend data
+export const fetchInfraErrorsTrend = async (timeRange: string): Promise<InfraErrorTrendPoint[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 200, max: 600 })));
+  
+  // Return trend data for the selected time range
+  if (timeRange === '7d') return MOCK_INFRA_ERRORS_TREND['7d'];
+  if (timeRange === '90d') return MOCK_INFRA_ERRORS_TREND['90d'];
+  
+  // Default to 30 days
+  return MOCK_INFRA_ERRORS_TREND['30d'];
 };
 
 // New function to fetch platform metrics

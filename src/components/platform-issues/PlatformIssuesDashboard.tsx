@@ -13,6 +13,7 @@ export function PlatformIssuesDashboard() {
   const { 
     issues, 
     trendData, 
+    infraTrendData,
     isLoading, 
     filters, 
     updateFilters,
@@ -96,7 +97,7 @@ export function PlatformIssuesDashboard() {
           }
         />
 
-        {/* Infra Errors Count Card */}
+        {/* Infra Errors Count Card with Line Graph */}
         <MetricCard
           title="Infrastructure Errors"
           value={metricData?.infraErrors || 0}
@@ -104,6 +105,35 @@ export function PlatformIssuesDashboard() {
           iconColor="text-red-500"
           isLoading={isLoading.metrics}
           subtext="Last 30 days"
+          customContent={
+            <div className="mt-4 h-16">
+              {infraTrendData && infraTrendData.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={infraTrendData.slice(-14)} // Show last 14 days
+                    margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                    <Line 
+                      type="monotone" 
+                      dataKey="count" 
+                      stroke="#EF4444" 
+                      strokeWidth={2} 
+                      dot={false} 
+                    />
+                    <XAxis dataKey="date" hide />
+                    <Tooltip 
+                      contentStyle={{ 
+                        background: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.75rem'
+                      }} 
+                      formatter={(value) => [`${value} errors`, 'Infra']}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          }
         />
       </div>
 
