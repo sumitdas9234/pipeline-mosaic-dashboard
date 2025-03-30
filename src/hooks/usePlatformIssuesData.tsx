@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
-import { fetchPlatformIssues, fetchPlatformIssuesTrend } from '@/data/mockPlatformIssues';
+import { fetchPlatformIssues, fetchPlatformIssuesTrend, fetchPlatformMetrics } from '@/data/mockPlatformIssues';
 
 interface PlatformIssueFilters {
   timeRange: string;
@@ -8,9 +8,19 @@ interface PlatformIssueFilters {
   severity: string | null;
 }
 
+interface PlatformMetrics {
+  priorityCount: number;
+  p0Count: number;
+  p1Count: number;
+  p2Count: number;
+  openRequests: number;
+  infraErrors: number;
+}
+
 export function usePlatformIssuesData() {
   const [issues, setIssues] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [metricData, setMetricData] = useState<PlatformMetrics | null>(null);
   const [filters, setFilters] = useState<PlatformIssueFilters>({
     timeRange: '30d',
     product: null,
@@ -20,10 +30,11 @@ export function usePlatformIssuesData() {
     issues: true,
     trend: true,
     filters: false,
+    metrics: true,
   });
 
   const fetchData = useCallback(async () => {
-    setIsLoading(prev => ({ ...prev, issues: true, trend: true }));
+    setIsLoading(prev => ({ ...prev, issues: true, trend: true, metrics: true }));
     
     try {
       const issuesData = await fetchPlatformIssues(filters);
@@ -31,10 +42,13 @@ export function usePlatformIssuesData() {
       
       const trendData = await fetchPlatformIssuesTrend(filters.timeRange);
       setTrendData(trendData);
+      
+      const metrics = await fetchPlatformMetrics(filters.timeRange);
+      setMetricData(metrics);
     } catch (error) {
       console.error('Error fetching platform issues data:', error);
     } finally {
-      setIsLoading(prev => ({ ...prev, issues: false, trend: false }));
+      setIsLoading(prev => ({ ...prev, issues: false, trend: false, metrics: false }));
     }
   }, [filters]);
 
@@ -49,6 +63,7 @@ export function usePlatformIssuesData() {
   return {
     issues,
     trendData,
+    metricData,
     filters,
     isLoading,
     updateFilters,

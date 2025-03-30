@@ -1,4 +1,3 @@
-
 import { faker } from '@faker-js/faker';
 import { FailureType } from '@/types';
 
@@ -20,6 +19,15 @@ export interface TrendDataPoint {
   count: number;
   active: number;
   resolved: number;
+}
+
+export interface PlatformMetrics {
+  priorityCount: number;
+  p0Count: number;
+  p1Count: number;
+  p2Count: number;
+  openRequests: number;
+  infraErrors: number;
 }
 
 // Generate mock platform issues
@@ -138,4 +146,24 @@ export const fetchPlatformIssuesTrend = async (timeRange: string): Promise<Trend
   
   // Default to 30 days
   return MOCK_TREND_DATA['30d'];
+};
+
+// New function to fetch platform metrics
+export const fetchPlatformMetrics = async (timeRange: string): Promise<PlatformMetrics> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, faker.number.int({ min: 300, max: 800 })));
+  
+  // Generate mock metrics data
+  const p0Count = faker.number.int({ min: 3, max: 12 });
+  const p1Count = faker.number.int({ min: 8, max: 25 });
+  const p2Count = faker.number.int({ min: 15, max: 40 });
+  
+  return {
+    priorityCount: p0Count + p1Count + p2Count,
+    p0Count,
+    p1Count,
+    p2Count,
+    openRequests: faker.number.int({ min: 20, max: 60 }),
+    infraErrors: faker.number.int({ min: 5, max: 18 })
+  };
 };

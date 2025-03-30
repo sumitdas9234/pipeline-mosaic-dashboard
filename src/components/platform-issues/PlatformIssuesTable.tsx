@@ -1,10 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { PlatformIssue } from '@/data/mockPlatformIssues';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationEllipsis, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 
 interface PlatformIssuesTableProps {
   issues: PlatformIssue[];
@@ -12,6 +21,18 @@ interface PlatformIssuesTableProps {
 }
 
 export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const issuesPerPage = 10;
+  const totalPages = Math.ceil(issues.length / issuesPerPage);
+  
+  const indexOfLastIssue = currentPage * issuesPerPage;
+  const indexOfFirstIssue = indexOfLastIssue - issuesPerPage;
+  const currentIssues = issues.slice(indexOfFirstIssue, indexOfLastIssue);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const getSeverityStatus = (severity: PlatformIssue['severity']) => {
     switch (severity) {
       case 'Critical':
@@ -76,7 +97,7 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
           </TableRow>
         </TableHeader>
         <TableBody>
-          {issues.map((issue) => (
+          {currentIssues.map((issue) => (
             <TableRow key={issue.id}>
               <TableCell className="font-medium">{issue.id}</TableCell>
               <TableCell className="max-w-md truncate">{issue.title}</TableCell>
@@ -107,6 +128,75 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
           ))}
         </TableBody>
       </Table>
+      
+      {/* Pagination */}
+      <div className="flex items-center justify-between py-4 px-2 border-t">
+        <div className="text-sm text-muted-foreground">
+          Showing {indexOfFirstIssue + 1} to {Math.min(indexOfLastIssue, issues.length)} of {issues.length} issues
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} 
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              // Logic to show appropriate page numbers
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+                if (i === 4) return (
+                  <PaginationItem key="ellipsis-end">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+                if (i === 0) return (
+                  <PaginationItem key="ellipsis-start">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              } else {
+                if (i === 0) return (
+                  <PaginationItem key="ellipsis-start">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+                if (i === 4) return (
+                  <PaginationItem key="ellipsis-end">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+                pageNum = currentPage - 1 + i;
+              }
+              
+              return (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink 
+                    onClick={() => handlePageChange(pageNum)}
+                    isActive={pageNum === currentPage}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            })}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 }
