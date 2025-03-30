@@ -14,6 +14,13 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PlatformIssuesTableProps {
   issues: PlatformIssue[];
@@ -22,11 +29,11 @@ interface PlatformIssuesTableProps {
 
 export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const issuesPerPage = 10;
-  const totalPages = Math.ceil(issues.length / issuesPerPage);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const totalPages = Math.ceil(issues.length / rowsPerPage);
   
-  const indexOfLastIssue = currentPage * issuesPerPage;
-  const indexOfFirstIssue = indexOfLastIssue - issuesPerPage;
+  const indexOfLastIssue = currentPage * rowsPerPage;
+  const indexOfFirstIssue = indexOfLastIssue - rowsPerPage;
   const currentIssues = issues.slice(indexOfFirstIssue, indexOfLastIssue);
   
   const handlePageChange = (page: number) => {
@@ -84,23 +91,24 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Issue</TableHead>
+            <TableHead>Jira Ticket</TableHead>
             <TableHead>Severity</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Jira Ticket</TableHead>
             <TableHead>Affected Pipelines</TableHead>
             <TableHead>First Occurrence</TableHead>
             <TableHead>Last Occurrence</TableHead>
-            <TableHead>Product</TableHead>
             <TableHead>Assignee</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentIssues.map((issue) => (
             <TableRow key={issue.id}>
-              <TableCell className="font-medium">{issue.id}</TableCell>
-              <TableCell className="max-w-md truncate">{issue.title}</TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-7">
+                  {issue.jiraTicket}
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
+              </TableCell>
               <TableCell>
                 <StatusBadge 
                   status={getSeverityStatus(issue.severity)} 
@@ -113,27 +121,39 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
                   failureType={issue.status}
                 />
               </TableCell>
-              <TableCell>
-                <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-7">
-                  {issue.jiraTicket}
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Button>
-              </TableCell>
               <TableCell>{issue.affectedPipelines}</TableCell>
               <TableCell>{issue.firstOccurrence}</TableCell>
               <TableCell>{issue.lastOccurrence}</TableCell>
-              <TableCell>{issue.product}</TableCell>
               <TableCell>{issue.assignee || '-'}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       
-      {/* Pagination */}
+      {/* Pagination with Rows per page selector */}
       <div className="flex items-center justify-between py-4 px-2 border-t">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Rows per page:</span>
+          <Select
+            value={rowsPerPage.toString()}
+            onValueChange={(value) => setRowsPerPage(Number(value))}
+          >
+            <SelectTrigger className="h-8 w-[70px] bg-gray-50 border-gray-100 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
         <div className="text-sm text-muted-foreground">
           Showing {indexOfFirstIssue + 1} to {Math.min(indexOfLastIssue, issues.length)} of {issues.length} issues
         </div>
+        
         <Pagination>
           <PaginationContent>
             <PaginationItem>

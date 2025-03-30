@@ -20,7 +20,7 @@ export function PlatformIssuesDashboard() {
   } = usePlatformIssuesData();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-[90%] mx-auto py-8">
       <DashboardHeader 
         title="Platform Issues" 
         description="Track and manage platform issues across all pipelines"
