@@ -1,11 +1,12 @@
 
 import { faker } from '@faker-js/faker';
+import { FailureType } from '@/types';
 
 export interface PlatformIssue {
   id: string;
   title: string;
-  severity: 'Critical' | 'High' | 'Medium' | 'Low';
-  status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  severity: FailureType; // Updated to use FailureType
+  status: FailureType; // Updated to use FailureType
   jiraTicket: string;
   affectedPipelines: number;
   firstOccurrence: string;

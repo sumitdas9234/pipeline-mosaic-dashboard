@@ -1,5 +1,6 @@
 
-export type FailureType = 'Infra error' | 'k8s install error' | 'Product install error' | 'Test error';
+export type FailureType = 'Infra error' | 'k8s install error' | 'Product install error' | 'Test error' | 
+  'Critical' | 'High' | 'Medium' | 'Low' | 'Open' | 'In Progress' | 'Resolved' | 'Closed';
 export type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
 
 export interface Pipeline {
@@ -77,6 +78,19 @@ export interface FilterOptions {
   buildId: string | null;
 }
 
+// TestItem interface needed for mockPipelineDetails.ts
+export interface TestItem {
+  id: string;
+  name: string;
+  status: Status;
+  duration: string;
+  logs: string;
+  step?: number;
+  testRunUrl?: string;
+  description?: string;
+  history?: Status[];
+}
+
 // Renamed from TestItem and added specific IDs
 export interface Testcase {
   testcaseId: string; // Unique ID for the testcase
@@ -91,10 +105,10 @@ export interface Testcase {
   history?: Status[]; // Add history for test execution
 }
 
-// Update PipelineDetail to use Testcase type
+// Update PipelineDetail to use Testcase type and add testItems
 export interface PipelineDetail extends Pipeline {
   description?: string;
-  // testItems: Testcase[]; // We might fetch this separately now
+  testItems: TestItem[]; // Add this field
   environment?: string;
   trigger?: string;
   startTime?: string;
