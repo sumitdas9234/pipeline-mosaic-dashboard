@@ -21,7 +21,7 @@ interface PipelineTestCasesTableProps {
   testcases: Testcase[];
 }
 
-const ALL_STATUSES = 'all'; // Constant for "All Statuses" option
+const ALL_STATUSES = 'all_statuses'; // Changed from 'all' to 'all_statuses'
 
 // Update component props
 export const PipelineTestCasesTable: React.FC<PipelineTestCasesTableProps> = ({ testcases }) => {

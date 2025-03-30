@@ -59,14 +59,14 @@ export function PlatformIssuesFilterBar({ filters, updateFilters, isLoading }: F
         <div className="text-sm font-medium mb-2">Product</div>
         <Select
           disabled={isLoading}
-          value={filters.product || ''}
-          onValueChange={(value) => updateFilters({ product: value || null })}
+          value={filters.product || "all_products"} // Use "all_products" instead of empty string
+          onValueChange={(value) => updateFilters({ product: value === "all_products" ? null : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="All products" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All products</SelectItem>
+            <SelectItem value="all_products">All products</SelectItem> {/* Change from empty string to "all_products" */}
             {products.map((product) => (
               <SelectItem key={product.value} value={product.value}>
                 {product.label}
@@ -80,14 +80,14 @@ export function PlatformIssuesFilterBar({ filters, updateFilters, isLoading }: F
         <div className="text-sm font-medium mb-2">Severity</div>
         <Select
           disabled={isLoading}
-          value={filters.severity || ''}
-          onValueChange={(value) => updateFilters({ severity: value || null })}
+          value={filters.severity || "all_severities"} // Use "all_severities" instead of empty string
+          onValueChange={(value) => updateFilters({ severity: value === "all_severities" ? null : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="All severities" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All severities</SelectItem>
+            <SelectItem value="all_severities">All severities</SelectItem> {/* Change from empty string to "all_severities" */}
             {severities.map((severity) => (
               <SelectItem key={severity.value} value={severity.value}>
                 {severity.label}

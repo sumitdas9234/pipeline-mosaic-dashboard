@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 // Import Pipeline and Testcase types separately
-import { Pipeline, Testcase, TestItem } from '@/types';
+import { Pipeline, Testcase, TestItem, PipelineDetail } from '@/types';
 // Import the correct fetch functions from mockData
 import { fetchPipelines, fetchTestcases } from '@/data/mockData';
 // Import the specific fetchPipelineDetail function
@@ -17,7 +17,7 @@ import { PipelineTestCasesTable } from '@/components/pipeline-detail/PipelineTes
 
 const PipelineDetailPage: React.FC = () => {
   const { id: pipelineId } = useParams<{ id: string }>(); // Rename id to pipelineId for clarity
-  const [pipeline, setPipeline] = useState<Pipeline | null>(null); // State for pipeline data
+  const [pipeline, setPipeline] = useState<PipelineDetail | null>(null); // Change type to PipelineDetail
   const [testcases, setTestcases] = useState<Testcase[]>([]); // State for testcase data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,7 @@ const PipelineDetailPage: React.FC = () => {
     };
 
     loadData(); // Call the renamed function
-  }, [pipelineId, toast]); // Use the renamed route parameter in the dependency array
+  }, [pipelineId, toast]);
 
   if (loading) {
     return (
