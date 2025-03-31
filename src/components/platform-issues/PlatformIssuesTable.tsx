@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { StatusBadge } from '@/components/common/StatusBadge';
 import { PlatformIssue } from '@/data/mockPlatformIssues';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ExternalLink, Search } from 'lucide-react';
@@ -22,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SeverityBadge } from './SeverityBadge';
+import { StatusBadge } from './StatusBadge';
 
 interface PlatformIssuesTableProps {
   issues: PlatformIssue[];
@@ -50,32 +51,6 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
     setCurrentPage(page);
   };
 
-  const getSeverityStatus = (severity: PlatformIssue['severity']) => {
-    switch (severity) {
-      case 'P0':
-        return 'failed';
-      case 'P1':
-        return 'failed';
-      case 'P2':
-        return 'inprogress';
-      default:
-        return 'pending';
-    }
-  };
-
-  const getIssueStatus = (status: PlatformIssue['status']) => {
-    switch (status) {
-      case 'Open':
-        return 'failed';
-      case 'In Progress':
-        return 'inprogress';
-      case 'Resolved':
-        return 'passed';
-      default:
-        return 'pending';
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="p-8 flex justify-center">
@@ -94,7 +69,7 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
 
   return (
     <div className="overflow-hidden">
-      {/* Add search bar */}
+      {/* Search bar */}
       <div className="p-4 border-b border-gray-100">
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -132,16 +107,10 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
                 </Button>
               </TableCell>
               <TableCell>
-                <StatusBadge 
-                  status={getSeverityStatus(issue.severity)} 
-                  failureType={issue.severity}
-                />
+                <SeverityBadge severity={issue.severity} />
               </TableCell>
               <TableCell>
-                <StatusBadge 
-                  status={getIssueStatus(issue.status)}
-                  failureType={issue.status}
-                />
+                <StatusBadge status={issue.status} />
               </TableCell>
               <TableCell>{issue.affectedPipelines}</TableCell>
               <TableCell>{issue.firstOccurrence}</TableCell>
