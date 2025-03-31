@@ -27,10 +27,9 @@ export function PlatformIssuesFilterBar({ filters, updateFilters, isLoading }: F
   ];
   
   const severities = [
-    { value: 'Critical', label: 'Critical' },
-    { value: 'High', label: 'High' },
-    { value: 'Medium', label: 'Medium' },
-    { value: 'Low', label: 'Low' },
+    { value: 'P0', label: 'P0' },
+    { value: 'P1', label: 'P1' },
+    { value: 'P2', label: 'P2' },
   ];
 
   return (
@@ -59,14 +58,14 @@ export function PlatformIssuesFilterBar({ filters, updateFilters, isLoading }: F
         <div className="text-sm font-medium mb-2">Product</div>
         <Select
           disabled={isLoading}
-          value={filters.product || "all_products"} // Use "all_products" instead of empty string
+          value={filters.product || "all_products"}
           onValueChange={(value) => updateFilters({ product: value === "all_products" ? null : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="All products" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all_products">All products</SelectItem> {/* Change from empty string to "all_products" */}
+            <SelectItem value="all_products">All products</SelectItem>
             {products.map((product) => (
               <SelectItem key={product.value} value={product.value}>
                 {product.label}
@@ -80,14 +79,14 @@ export function PlatformIssuesFilterBar({ filters, updateFilters, isLoading }: F
         <div className="text-sm font-medium mb-2">Severity</div>
         <Select
           disabled={isLoading}
-          value={filters.severity || "all_severities"} // Use "all_severities" instead of empty string
+          value={filters.severity || "all_severities"}
           onValueChange={(value) => updateFilters({ severity: value === "all_severities" ? null : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="All severities" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all_severities">All severities</SelectItem> {/* Change from empty string to "all_severities" */}
+            <SelectItem value="all_severities">All severities</SelectItem>
             {severities.map((severity) => (
               <SelectItem key={severity.value} value={severity.value}>
                 {severity.label}

@@ -8,6 +8,7 @@ import { MetricCard } from '@/components/common/MetricCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+import { SeverityBadge } from './SeverityBadge';
 
 export function PlatformIssuesDashboard() {
   const { 
@@ -45,16 +46,16 @@ export function PlatformIssuesDashboard() {
           customContent={
             <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
               <div className="flex flex-col items-center">
+                <SeverityBadge severity="P0" size="sm" className="mb-1" />
                 <span className="font-medium text-red-600">{metricData?.p0Count || 0}</span>
-                <span className="text-xs text-gray-500">P0</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="font-medium text-orange-500">{metricData?.p1Count || 0}</span>
-                <span className="text-xs text-gray-500">P1</span>
+                <SeverityBadge severity="P1" size="sm" className="mb-1" />
+                <span className="font-medium text-red-500">{metricData?.p1Count || 0}</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="font-medium text-yellow-500">{metricData?.p2Count || 0}</span>
-                <span className="text-xs text-gray-500">P2</span>
+                <SeverityBadge severity="P2" size="sm" className="mb-1" />
+                <span className="font-medium text-amber-600">{metricData?.p2Count || 0}</span>
               </div>
             </div>
           }
