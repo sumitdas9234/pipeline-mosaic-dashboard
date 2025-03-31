@@ -1,4 +1,3 @@
-
 import { faker } from '@faker-js/faker';
 import { FailureType } from '@/types';
 
@@ -13,6 +12,8 @@ export interface PlatformIssue {
   lastOccurrence: string;
   product: string;
   assignee: string | null;
+  description?: string; // Added description property
+  notes?: string; // Added notes property
 }
 
 export interface TrendDataPoint {
@@ -65,6 +66,12 @@ const generateMockIssues = (count: number): PlatformIssue[] => {
       assignee: faker.datatype.boolean() 
         ? faker.person.fullName() 
         : null,
+      description: faker.datatype.boolean() 
+        ? faker.lorem.paragraphs({ min: 1, max: 3 })
+        : undefined,
+      notes: faker.datatype.boolean() 
+        ? faker.lorem.sentences({ min: 1, max: 3 })
+        : undefined,
     });
   }
 
