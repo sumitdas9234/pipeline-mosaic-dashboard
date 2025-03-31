@@ -6,12 +6,14 @@ import { PipelineTable } from './PipelineTable';
 import { usePipelineData } from '@/hooks/usePipelineData';
 import { useBuildDetails } from '@/hooks/useBuildDetails';
 import { BuildDetailSheet } from './build-detail/BuildDetailSheet';
-// Re-import Progress, remove Tooltip components (unless used elsewhere)
 import { Progress } from '@/components/ui/progress';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Keep Tooltip for now, might be used elsewhere
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Bug, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function Dashboard() {
+  const navigate = useNavigate();
+  
   const {
     products,
     pipelines,
@@ -52,7 +54,6 @@ export function Dashboard() {
   const availableReleases = getAvailableReleases();
   const availableBuilds = getAvailableBuilds();
 
-  // Get selected build number and date for display
   const getSelectedBuildInfo = () => {
     if (!filters.buildId) return { buildNumber: null, date: null };
     const build = availableBuilds.find(b => b.id === filters.buildId);
@@ -61,12 +62,11 @@ export function Dashboard() {
 
   const { buildNumber, date } = getSelectedBuildInfo();
 
-  // Calculate status counts and total pipelines specifically for the selected build
   const calculateCurrentBuildStats = () => {
     const counts = { passed: 0, failed: 0, inprogress: 0, aborted: 0, pending: 0, total: 0 };
     if (filters.buildId && pipelines) {
       pipelines.forEach(p => {
-        counts.total++; // Increment total for every pipeline in the selected build
+        counts.total++;
         if (p.status === 'passed') counts.passed++;
         else if (p.status === 'failed') counts.failed++;
         else if (p.status === 'inprogress') counts.inprogress++;
@@ -79,7 +79,6 @@ export function Dashboard() {
 
   const currentBuildStats = calculateCurrentBuildStats();
 
-  // Calculate platform issues for the current build
   const calculatePlatformIssues = () => {
     let platformIssueCount = 0;
     if (filters.buildId && pipelines) {
@@ -97,11 +96,9 @@ export function Dashboard() {
 
   const currentPlatformIssues = calculatePlatformIssues();
 
-  // Calculate success rate based on the total pipelines for the current build
   const currentBuildSuccessRate = currentBuildStats.total > 0
     ? Math.round((currentBuildStats.passed / currentBuildStats.total) * 100)
     : 0;
-
 
   return (
     <div className="p-6 w-[90%] mx-auto">
@@ -123,13 +120,13 @@ export function Dashboard() {
         isLoading={loading.products}
       />
       
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <MetricCard
           title="Platform Issues"
-          value={currentPlatformIssues} // Use the newly calculated value
+          value={currentPlatformIssues} 
           icon="bug"
-          isLoading={loading.pipelines} // Use pipeline loading state as it depends on pipeline data
+          isLoading={loading.pipelines}
+          linkTo="/platform-issues"
           customContent={
             <div className="mt-2 text-xs text-gray-500">
               <div className="flex items-center gap-1 mb-2">
@@ -141,21 +138,17 @@ export function Dashboard() {
           }
         />
         
-        {/* Renamed to Total Coverage and updated display */}
         <MetricCard
-          title="Total Coverage" // Renamed title
-          value={`${currentBuildSuccessRate}%`} // Value remains success rate for main display
+          title="Total Coverage"
+          value={`${currentBuildSuccessRate}%`}
           icon="chart"
           isLoading={loading.pipelines}
           customContent={
-            // Revert to simple Progress bar display
             <div className="mt-2 space-y-1">
               <Progress
                 value={currentBuildSuccessRate}
                 className="h-2"
-                // Removed invalid indicatorClassName prop
               />
-              {/* Reverted Legend Text */}
               <div className="flex justify-between text-xs text-gray-500">
                 <span>{currentBuildStats.passed} passed</span>
                 <span>of {currentBuildStats.total} total</span>
@@ -195,7 +188,6 @@ export function Dashboard() {
             Current Build Status: <span>{buildNumber || '-'}</span>
           </h3>
           <div className="grid grid-cols-3 gap-3">
-            {/* Use currentBuildStats calculated directly */}
             <div className="flex flex-col items-center bg-green-50 py-2 px-3 rounded-lg">
               <span className="font-semibold text-lg text-status-passed">
                 {currentBuildStats.passed}
@@ -212,7 +204,7 @@ export function Dashboard() {
 
             <div className="flex flex-col items-center bg-blue-50 py-2 px-3 rounded-lg">
               <span className="font-semibold text-lg text-status-inprogress">
-                {currentBuildStats.inprogress + currentBuildStats.pending} {/* Combine inprogress and pending for Running */}
+                {currentBuildStats.inprogress + currentBuildStats.pending}
               </span>
               <span className="text-xs text-gray-500">Running</span>
             </div>
@@ -220,18 +212,15 @@ export function Dashboard() {
         </div>
       </div>
       
-      {/* Pipelines Table */}
       <PipelineTable 
         pipelines={pipelines} 
         isLoading={loading.pipelines}
       />
 
-      {/* Build Detail Sheet */}
       <BuildDetailSheet
         isOpen={isSheetOpen}
         onClose={closeSheet}
         build={buildDetails}
-        // Pass the correctly calculated counts for the selected build
         pipelineStats={currentBuildStats}
       />
     </div>

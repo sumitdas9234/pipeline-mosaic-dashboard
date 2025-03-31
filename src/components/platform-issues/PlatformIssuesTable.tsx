@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PlatformIssue } from '@/data/mockPlatformIssues';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { SeverityBadge } from './SeverityBadge';
 import { StatusBadge } from './StatusBadge';
+import { IssueDetailSheet } from './IssueDetailSheet';
 
 interface PlatformIssuesTableProps {
   issues: PlatformIssue[];
@@ -33,6 +33,8 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIssue, setSelectedIssue] = useState<PlatformIssue | null>(null);
+  const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
   
   // Filter issues based on search term
   const filteredIssues = issues.filter(issue => 
@@ -49,6 +51,15 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
   
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleRowClick = (issue: PlatformIssue) => {
+    setSelectedIssue(issue);
+    setIsDetailSheetOpen(true);
+  };
+
+  const handleCloseDetailSheet = () => {
+    setIsDetailSheetOpen(false);
   };
 
   if (isLoading) {
@@ -99,9 +110,21 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
         </TableHeader>
         <TableBody>
           {currentIssues.map((issue) => (
-            <TableRow key={issue.id}>
+            <TableRow 
+              key={issue.id} 
+              className="cursor-pointer hover:bg-gray-50"
+              onClick={() => handleRowClick(issue)}
+            >
               <TableCell>
-                <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-7">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="flex items-center gap-1 px-2 h-7"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`https://jira.example.com/browse/${issue.jiraTicket}`, '_blank');
+                  }}
+                >
                   {issue.jiraTicket}
                   <ExternalLink className="h-3.5 w-3.5" />
                 </Button>
@@ -213,6 +236,13 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
           </Pagination>
         </div>
       </div>
+      
+      {/* Issue Detail Sheet */}
+      <IssueDetailSheet 
+        isOpen={isDetailSheetOpen} 
+        onClose={handleCloseDetailSheet} 
+        issue={selectedIssue} 
+      />
     </div>
   );
 }
