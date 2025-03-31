@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { PlatformIssue } from '@/data/mockPlatformIssues';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Pagination, 
   PaginationContent, 
@@ -30,11 +31,20 @@ interface PlatformIssuesTableProps {
 export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const totalPages = Math.ceil(issues.length / rowsPerPage);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Filter issues based on search term
+  const filteredIssues = issues.filter(issue => 
+    issue.jiraTicket.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    issue.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    issue.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const totalPages = Math.ceil(filteredIssues.length / rowsPerPage);
   
   const indexOfLastIssue = currentPage * rowsPerPage;
   const indexOfFirstIssue = indexOfLastIssue - rowsPerPage;
-  const currentIssues = issues.slice(indexOfFirstIssue, indexOfLastIssue);
+  const currentIssues = filteredIssues.slice(indexOfFirstIssue, indexOfLastIssue);
   
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -42,14 +52,12 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
 
   const getSeverityStatus = (severity: PlatformIssue['severity']) => {
     switch (severity) {
-      case 'Critical':
+      case 'P0':
         return 'failed';
-      case 'High':
+      case 'P1':
         return 'failed';
-      case 'Medium':
+      case 'P2':
         return 'inprogress';
-      case 'Low':
-        return 'pending';
       default:
         return 'pending';
     }
@@ -62,8 +70,6 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
       case 'In Progress':
         return 'inprogress';
       case 'Resolved':
-        return 'passed';
-      case 'Closed':
         return 'passed';
       default:
         return 'pending';
@@ -88,6 +94,22 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
 
   return (
     <div className="overflow-hidden">
+      {/* Add search bar */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Search by ticket, title, assignee"
+            className="pl-10 h-9 bg-gray-50 border-gray-100 text-sm"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page when searching
+            }}
+          />
+        </div>
+      </div>
+      
       <Table>
         <TableHeader>
           <TableRow>
@@ -154,7 +176,7 @@ export function PlatformIssuesTable({ issues, isLoading }: PlatformIssuesTablePr
         </div>
         
         <div className="text-sm text-muted-foreground">
-          Showing {indexOfFirstIssue + 1} to {Math.min(indexOfLastIssue, issues.length)} of {issues.length} issues
+          Showing {indexOfFirstIssue + 1} to {Math.min(indexOfLastIssue, filteredIssues.length)} of {filteredIssues.length} issues
         </div>
         
         <div>

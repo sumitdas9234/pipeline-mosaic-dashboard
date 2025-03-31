@@ -1,11 +1,12 @@
+
 import { faker } from '@faker-js/faker';
 import { FailureType } from '@/types';
 
 export interface PlatformIssue {
   id: string;
   title: string;
-  severity: FailureType; // Updated to use FailureType
-  status: FailureType; // Updated to use FailureType
+  severity: 'P0' | 'P1' | 'P2'; // Updated to use specific priority values
+  status: 'Open' | 'In Progress' | 'Resolved'; // Updated to use specific status values
   jiraTicket: string;
   affectedPipelines: number;
   firstOccurrence: string;
@@ -38,8 +39,8 @@ export interface PlatformMetrics {
 // Generate mock platform issues
 const generateMockIssues = (count: number): PlatformIssue[] => {
   const issues: PlatformIssue[] = [];
-  const severities: PlatformIssue['severity'][] = ['Critical', 'High', 'Medium', 'Low'];
-  const statuses: PlatformIssue['status'][] = ['Open', 'In Progress', 'Resolved', 'Closed'];
+  const severities: PlatformIssue['severity'][] = ['P0', 'P1', 'P2'];
+  const statuses: PlatformIssue['status'][] = ['Open', 'In Progress', 'Resolved'];
   const products = ['Product A', 'Product B', 'Product C'];
 
   for (let i = 0; i < count; i++) {

@@ -1,6 +1,5 @@
-
 export type FailureType = 'Infra error' | 'k8s install error' | 'Product install error' | 'Test error' | 
-  'Critical' | 'High' | 'Medium' | 'Low' | 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  'P0' | 'P1' | 'P2' | 'Open' | 'In Progress' | 'Resolved';
 export type Status = 'passed' | 'failed' | 'aborted' | 'pending' | 'inprogress';
 
 export interface Pipeline {
