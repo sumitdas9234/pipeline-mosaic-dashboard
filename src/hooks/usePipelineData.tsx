@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from 'react';
 import { 
   fetchProducts, 
@@ -10,6 +11,7 @@ import {
   PipelineStats,
   FilterOptions
 } from '@/types';
+import { fetchProductsAndReleases, transformApiData } from '@/data/api';
 
 const defaultFilters: FilterOptions = {
   productId: null,
@@ -32,6 +34,31 @@ export function usePipelineData(initialFilters: FilterOptions = defaultFilters) 
   useEffect(() => {
     const loadProducts = async () => {
       try {
+        // Fetch from API first, fall back to mock data
+        try {
+          const apiData = await fetchProductsAndReleases();
+          if (apiData && apiData.length > 0) {
+            const transformedData = transformApiData(apiData);
+            setProducts(transformedData);
+            
+            // Set default product if available and not already set
+            if (transformedData.length > 0 && !filters.productId) {
+              setFilters(prev => ({
+                ...prev,
+                productId: transformedData[0].id,
+                releaseId: transformedData[0].releases.length > 0 ? transformedData[0].releases[0].id : null,
+                buildId: transformedData[0].releases.length > 0 && transformedData[0].releases[0].builds.length > 0 
+                  ? transformedData[0].releases[0].builds[0].id 
+                  : null
+              }));
+            }
+            return;
+          }
+        } catch (apiError) {
+          console.error('Error fetching from API, falling back to mock data:', apiError);
+        }
+        
+        // Fall back to mock data if API fails
         const data = await fetchProducts();
         setProducts(data);
         
